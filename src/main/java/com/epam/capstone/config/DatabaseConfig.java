@@ -21,6 +21,12 @@ public class DatabaseConfig {
     private final ApplicationContext applicationContext;
     private final Environment environment;
 
+    private final int DEFAULT_MAX_POOL_SIZE = 4;
+    private final int DEFAULT_MAX_ACTIVE_POOL_SIZE = 2;
+    private final int DEFAULT_CONNECTION_TIMEOUT = 30000;
+    private final int DEFAULT_IDLE_TIMEOUT = 600000;
+    private final int DEFAULT_MAX_LIFETIME = 1800000;
+
     @Autowired
     public DatabaseConfig(ApplicationContext applicationContext, Environment environment) {
         this.applicationContext = applicationContext;
@@ -39,6 +45,17 @@ public class DatabaseConfig {
         cfg.setJdbcUrl(environment.getProperty("spring.datasource.url"));
         cfg.setUsername(environment.getProperty("spring.datasource.username"));
         cfg.setPassword(environment.getProperty("spring.datasource.password"));
+
+        cfg.setMaximumPoolSize(environment.getProperty("spring.datasource.hikari.maximum-pool-size",
+                Integer.class, DEFAULT_MAX_POOL_SIZE));
+        cfg.setMinimumIdle(environment.getProperty("spring.datasource.hikari.minimum-idle",
+                Integer.class, DEFAULT_MAX_ACTIVE_POOL_SIZE));
+        cfg.setConnectionTimeout(environment.getProperty("spring.datasource.hikari.connection-timeout",
+                Integer.class, DEFAULT_CONNECTION_TIMEOUT));
+        cfg.setIdleTimeout(environment.getProperty("spring.datasource.hikari.idle-timeout",
+                Integer.class, DEFAULT_IDLE_TIMEOUT));
+        cfg.setMaxLifetime(environment.getProperty("spring.datasource.hikari.max-lifetime",
+                Integer.class, DEFAULT_MAX_LIFETIME));
         return new HikariDataSource(cfg);
     }
 
