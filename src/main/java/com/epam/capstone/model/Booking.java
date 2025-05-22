@@ -8,29 +8,25 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @Builder
 public class Booking {
     @EqualsAndHashCode.Include
-    @ToString.Include
-    private long bookingId;
+    private Long bookingId;
 
-    private User user;
-    private Room room;
-    private Status status;
+    private Long userId;
+    private Long roomId;
+    private Short statusId;
 
     @EqualsAndHashCode.Include
-    @ToString.Include
     private LocalDateTime startTime;
 
     @EqualsAndHashCode.Include
-    @ToString.Include
     private LocalDateTime endTime;
 
     private String purpose;
 
     @EqualsAndHashCode.Include
-    @ToString.Include
     private LocalDateTime createdAt;
 }
 

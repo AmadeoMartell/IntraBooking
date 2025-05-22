@@ -2,30 +2,24 @@ package com.epam.capstone.model;
 
 import lombok.*;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
+@ToString
 @Builder
 public class Room {
     @EqualsAndHashCode.Include
-    @ToString.Include
-    private int roomId;
+    private Long roomId;
 
-    private Location location;
-    private RoomType type;
+    private Long locationId;
+    private Integer typeId;
 
     @EqualsAndHashCode.Include
-    @ToString.Include
     private String name;
 
-    private int capacity;
+    private Integer capacity;
     private String description;
-
-    private List<Booking> bookings;
 }
 
 
