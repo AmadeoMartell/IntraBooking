@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -18,7 +19,7 @@ public class BookingDao implements CrudDao<Booking, Long> {
     private static final String INSERT_SQL =
             "INSERT INTO bookings (user_id, room_id, status_id, start_time, end_time, purpose) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_SQL =
-            "UPDATE bookings SET user_id = ?, room_id = ?, status_id = ?, start_time = ?, end_time = ?, purpose = ? WHERE booking_id = ?";
+            "UPDATE bookings SET user_id = ?, room_id = ?, status_id = ?, start_time = ?, end_time = ?, purpose = ?, updated_at = ? WHERE booking_id = ?";
     private static final String DELETE_SQL =
             "DELETE FROM bookings WHERE booking_id = ?";
 
@@ -61,7 +62,8 @@ public class BookingDao implements CrudDao<Booking, Long> {
                 booking.getStartTime(),
                 booking.getEndTime(),
                 booking.getPurpose(),
-                booking.getBookingId());
+                booking.getBookingId(),
+                LocalDateTime.now());
     }
 
     @Override

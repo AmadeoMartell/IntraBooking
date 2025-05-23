@@ -49,6 +49,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
         encoder.start();
 
         ConsoleAppender<ILoggingEvent> console = new ConsoleAppender<>();
+        console.setName("STDOUT");
         console.setContext(ctx);
         console.setEncoder(encoder);
         console.start();
@@ -61,6 +62,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
         ch.qos.logback.classic.Logger appLogger =
                 ctx.getLogger("com.epam.capstone");
         appLogger.setLevel(Level.DEBUG);
+        appLogger.setAdditive(false);
         appLogger.addAppender(console);
 
         ctx.getLogger("org.springframework").setLevel(Level.WARN);

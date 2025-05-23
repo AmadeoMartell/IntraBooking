@@ -18,6 +18,7 @@ public class BookingRowMapper implements RowMapper<Booking> {
                 .endTime(rs.getTimestamp("end_time").toLocalDateTime())
                 .purpose(rs.getString("purpose"))
                 .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                 .build();
     }
 }

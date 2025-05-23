@@ -2,6 +2,8 @@ package com.epam.capstone.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -13,19 +15,24 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
 
 @Configuration
 @EnableTransactionManagement
+@Slf4j
 public class DatabaseConfig {
 
     private final ApplicationContext applicationContext;
     private final Environment environment;
 
-    private final int DEFAULT_MAX_POOL_SIZE = 4;
-    private final int DEFAULT_MAX_ACTIVE_POOL_SIZE = 2;
-    private final int DEFAULT_CONNECTION_TIMEOUT = 30000;
-    private final int DEFAULT_IDLE_TIMEOUT = 600000;
-    private final int DEFAULT_MAX_LIFETIME = 1800000;
+    private final static int DEFAULT_MAX_POOL_SIZE = 4;
+    private final static int DEFAULT_MAX_ACTIVE_POOL_SIZE = 2;
+    private final static int DEFAULT_CONNECTION_TIMEOUT = 30000;
+    private final static int DEFAULT_IDLE_TIMEOUT = 600000;
+    private final static int DEFAULT_MAX_LIFETIME = 1800000;
 
     @Autowired
     public DatabaseConfig(ApplicationContext applicationContext, Environment environment) {
@@ -62,5 +69,19 @@ public class DatabaseConfig {
     @Bean
     public PlatformTransactionManager transactionManager(DataSource ds) {
         return new DataSourceTransactionManager(ds);
+    }
+
+    @PreDestroy
+    public void deregisterJdbcDrivers() {
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            try {
+                DriverManager.deregisterDriver(driver);
+                log.info("Deregistering JDBC driver {}", driver);
+            } catch (SQLException ex) {
+                log.error("Error deregistering JDBC driver {}", driver, ex);
+            }
+        }
     }
 }

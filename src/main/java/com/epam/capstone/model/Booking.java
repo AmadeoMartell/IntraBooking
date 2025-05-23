@@ -1,6 +1,11 @@
 package com.epam.capstone.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -26,8 +31,8 @@ public class Booking {
 
     private String purpose;
 
-    @EqualsAndHashCode.Include
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
 
 

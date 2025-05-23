@@ -2,13 +2,16 @@ package com.epam.capstone.dao;
 
 import com.epam.capstone.mapper.row.UserRowMapper;
 import com.epam.capstone.model.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
+@Slf4j
 public class UserDao implements CrudDao<User, Long>{
 
     private static final String FIND_BY_ID_SQL = "SELECT * FROM users WHERE user_id = ?";
@@ -17,9 +20,11 @@ public class UserDao implements CrudDao<User, Long>{
             "(role_id, username, password_hash, full_name, email, phone)" +
             " VALUES (?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_SQL = "UPDATE users " +
-            "SET role_id = ?, username = ?, password_hash = ?, full_name = ?, email = ?, phone = ?" +
+            "SET role_id = ?, username = ?, password_hash = ?, full_name = ?, email = ?, phone = ?, updated_at = ?" +
             " WHERE user_id = ?";
     private static final String DELETE_SQL = "DELETE FROM users WHERE user_id = ?";
+    private static final String FIND_BY_USERNAME_SQL =
+            "SELECT * FROM users WHERE username = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final UserRowMapper rowMapper;
@@ -28,6 +33,15 @@ public class UserDao implements CrudDao<User, Long>{
     public UserDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.rowMapper = new UserRowMapper();
+    }
+
+    public User findByUsername(String username) {
+        log.debug("Finding user by Username {}", username);
+        return jdbcTemplate.queryForObject(
+                FIND_BY_USERNAME_SQL,
+                rowMapper,
+                username
+        );
     }
 
     @Override
@@ -60,7 +74,8 @@ public class UserDao implements CrudDao<User, Long>{
                 user.getFullName(),
                 user.getEmail(),
                 user.getPhone(),
-                user.getUserId());
+                user.getUserId(),
+                LocalDateTime.now());
     }
 
     @Override

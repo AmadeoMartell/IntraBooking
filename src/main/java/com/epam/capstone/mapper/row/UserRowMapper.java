@@ -18,6 +18,7 @@ public class UserRowMapper implements RowMapper<User> {
                 .email(rs.getString("email"))
                 .phone(rs.getString("phone"))
                 .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
                 .build();
     }
 }
