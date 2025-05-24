@@ -65,6 +65,11 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
         appLogger.setAdditive(false);
         appLogger.addAppender(console);
 
+        var jdbcDrv = ctx.getLogger("jdbc-driver");
+        jdbcDrv.setLevel(Level.WARN);
+        jdbcDrv.setAdditive(false);
+        jdbcDrv.addAppender(console);
+
         ctx.getLogger("org.springframework").setLevel(Level.WARN);
         ctx.getLogger("org.springframework.web").setLevel(Level.WARN);
         ctx.getLogger("org.hibernate").setLevel(Level.WARN);
