@@ -1,6 +1,6 @@
 package com.epam.capstone.dao;
 
-import com.epam.capstone.mapper.row.BookingRowMapper;
+import com.epam.capstone.dao.rowmapper.BookingRowMapper;
 import com.epam.capstone.model.Booking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

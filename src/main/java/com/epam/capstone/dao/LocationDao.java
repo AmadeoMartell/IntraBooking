@@ -1,6 +1,6 @@
 package com.epam.capstone.dao;
 
-import com.epam.capstone.mapper.row.LocationRowMapper;
+import com.epam.capstone.dao.rowmapper.LocationRowMapper;
 import com.epam.capstone.model.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

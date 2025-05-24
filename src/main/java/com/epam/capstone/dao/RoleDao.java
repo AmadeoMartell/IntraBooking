@@ -1,6 +1,6 @@
 package com.epam.capstone.dao;
 
-import com.epam.capstone.mapper.row.RoleRowMapper;
+import com.epam.capstone.dao.rowmapper.RoleRowMapper;
 import com.epam.capstone.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

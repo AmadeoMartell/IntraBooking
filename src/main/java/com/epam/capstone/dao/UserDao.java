@@ -1,6 +1,6 @@
 package com.epam.capstone.dao;
 
-import com.epam.capstone.mapper.row.UserRowMapper;
+import com.epam.capstone.dao.rowmapper.UserRowMapper;
 import com.epam.capstone.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

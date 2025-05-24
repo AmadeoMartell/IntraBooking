@@ -1,6 +1,6 @@
 package com.epam.capstone.dao;
 
-import com.epam.capstone.mapper.row.StatusRowMapper;
+import com.epam.capstone.dao.rowmapper.StatusRowMapper;
 import com.epam.capstone.model.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
