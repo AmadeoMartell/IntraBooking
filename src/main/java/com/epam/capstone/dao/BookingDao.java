@@ -1,9 +1,10 @@
 package com.epam.capstone.dao;
 
+import com.epam.capstone.util.database.CustomJdbcTemplate;
 import com.epam.capstone.dao.rowmapper.BookingRowMapper;
 import com.epam.capstone.model.Booking;
+import org.intellij.lang.annotations.Language;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -12,22 +13,24 @@ import java.util.List;
 @Repository
 public class BookingDao implements CrudDao<Booking, Long> {
 
-    private static final String FIND_BY_ID_SQL =
-            "SELECT * FROM bookings WHERE booking_id = ?";
-    private static final String FIND_ALL_SQL =
-            "SELECT * FROM bookings";
+    @Language("SQL")
+    private static final String FIND_BY_ID_SQL = "SELECT * FROM bookings WHERE booking_id = ?";
+    @Language("SQL")
+    private static final String FIND_ALL_SQL = "SELECT * FROM bookings";
+    @Language("SQL")
     private static final String INSERT_SQL =
             "INSERT INTO bookings (user_id, room_id, status_id, start_time, end_time, purpose) VALUES (?, ?, ?, ?, ?, ?)";
+    @Language("SQL")
     private static final String UPDATE_SQL =
             "UPDATE bookings SET user_id = ?, room_id = ?, status_id = ?, start_time = ?, end_time = ?, purpose = ?, updated_at = ? WHERE booking_id = ?";
-    private static final String DELETE_SQL =
-            "DELETE FROM bookings WHERE booking_id = ?";
+    @Language("SQL")
+    private static final String DELETE_SQL = "DELETE FROM bookings WHERE booking_id = ?";
 
-    private final JdbcTemplate jdbcTemplate;
+    private final CustomJdbcTemplate jdbcTemplate;
     private final BookingRowMapper rowMapper;
 
     @Autowired
-    public BookingDao(JdbcTemplate jdbcTemplate) {
+    public BookingDao(CustomJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.rowMapper = new BookingRowMapper();
     }

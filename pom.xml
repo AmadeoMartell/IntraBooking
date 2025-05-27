@@ -29,6 +29,7 @@
     <lombok.version>1.18.36</lombok.version>
     <slf4j-api.version>2.0.17</slf4j-api.version>
     <logback.version>1.5.18</logback.version>
+    <jetbrains.annotations.version>26.0.2</jetbrains.annotations.version>
   </properties>
 
   <dependencies>
@@ -112,6 +113,12 @@
       <artifactId>jakarta.annotation-api</artifactId>
       <version>${jakarta.annotation-api.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>${jetbrains.annotations.version}</version>
     </dependency>
 
     <dependency>

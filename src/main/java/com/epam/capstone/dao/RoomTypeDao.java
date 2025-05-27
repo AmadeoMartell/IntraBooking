@@ -1,9 +1,10 @@
 package com.epam.capstone.dao;
 
+import com.epam.capstone.util.database.CustomJdbcTemplate;
 import com.epam.capstone.dao.rowmapper.RoomTypeRowMapper;
 import com.epam.capstone.model.RoomType;
+import org.intellij.lang.annotations.Language;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,17 +12,22 @@ import java.util.List;
 @Repository
 public class RoomTypeDao implements CrudDao<RoomType, Integer> {
 
+    @Language("SQL")
     private static final String FIND_BY_ID_SQL = "SELECT * FROM room_types WHERE type_id = ?";
+    @Language("SQL")
     private static final String FIND_ALL_SQL = "SELECT * FROM room_types";
+    @Language("SQL")
     private static final String INSERT_SQL = "INSERT INTO room_types (name, capacity, description) VALUES (?, ?, ?)";
+    @Language("SQL")
     private static final String UPDATE_SQL = "UPDATE room_types SET name = ?, capacity = ?, description = ? WHERE type_id = ?";
+    @Language("SQL")
     private static final String DELETE_SQL = "DELETE FROM room_types WHERE type_id = ?";
 
-    private final JdbcTemplate jdbcTemplate;
+    private final CustomJdbcTemplate jdbcTemplate;
     private final RoomTypeRowMapper rowMapper;
 
     @Autowired
-    public RoomTypeDao(JdbcTemplate jdbcTemplate) {
+    public RoomTypeDao(CustomJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.rowMapper = new RoomTypeRowMapper();
     }

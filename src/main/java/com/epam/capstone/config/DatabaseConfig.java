@@ -1,13 +1,13 @@
 package com.epam.capstone.config;
 
-import com.epam.capstone.config.database.ConnectionPool;
+import com.epam.capstone.util.database.ConnectionPool;
+import com.epam.capstone.util.database.CustomJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -38,8 +38,8 @@ public class DatabaseConfig {
     }
 
     @Bean
-    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
+    public CustomJdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new CustomJdbcTemplate(dataSource);
     }
 
     @Bean

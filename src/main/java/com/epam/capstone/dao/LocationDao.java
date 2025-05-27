@@ -1,9 +1,10 @@
 package com.epam.capstone.dao;
 
+import com.epam.capstone.util.database.CustomJdbcTemplate;
 import com.epam.capstone.dao.rowmapper.LocationRowMapper;
 import com.epam.capstone.model.Location;
+import org.intellij.lang.annotations.Language;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,17 +12,22 @@ import java.util.List;
 @Repository
 public class LocationDao implements CrudDao<Location, Long> {
 
+    @Language("SQL")
     private static final String FIND_BY_ID_SQL = "SELECT * FROM locations WHERE location_id = ?";
+    @Language("SQL")
     private static final String FIND_ALL_SQL = "SELECT * FROM locations";
+    @Language("SQL")
     private static final String INSERT_SQL = "INSERT INTO locations (name, address, description) VALUES (?, ?, ?)";
+    @Language("SQL")
     private static final String UPDATE_SQL = "UPDATE locations SET name = ?, address = ?, description = ? WHERE location_id = ?";
+    @Language("SQL")
     private static final String DELETE_SQL = "DELETE FROM locations WHERE location_id = ?";
 
-    private final JdbcTemplate jdbcTemplate;
+    private final CustomJdbcTemplate jdbcTemplate;
     private final LocationRowMapper rowMapper;
 
     @Autowired
-    public LocationDao(JdbcTemplate jdbcTemplate) {
+    public LocationDao(CustomJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.rowMapper = new LocationRowMapper();
     }
