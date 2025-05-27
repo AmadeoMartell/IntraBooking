@@ -3,6 +3,7 @@ package com.epam.capstone.dao;
 import com.epam.capstone.dao.rowmapper.RoleRowMapper;
 import com.epam.capstone.model.Role;
 import com.epam.capstone.util.database.CustomJdbcTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.intellij.lang.annotations.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+@Slf4j
 public class RoleDao implements CrudDao<Role, Long> {
 
     @Language("SQL")
@@ -22,6 +24,8 @@ public class RoleDao implements CrudDao<Role, Long> {
     private static final String UPDATE_SQL = "UPDATE roles SET name = ?, description = ? WHERE role_id = ?";
     @Language("SQL")
     private static final String DELETE_SQL = "DELETE FROM roles WHERE role_id = ?";
+    @Language("SQL")
+    private static final String FIND_BY_NAME_SQL = "SELECT * FROM roles WHERE name = ?";
 
     private final CustomJdbcTemplate jdbcTemplate;
     private final RoleRowMapper rowMapper;
@@ -30,6 +34,11 @@ public class RoleDao implements CrudDao<Role, Long> {
     public RoleDao(CustomJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.rowMapper = new RoleRowMapper();
+    }
+
+    public Role findByName(String name) {
+        log.debug("Finding Role by Name {}", name);
+        return jdbcTemplate.queryForObject(FIND_BY_NAME_SQL, rowMapper, name);
     }
 
     @Override

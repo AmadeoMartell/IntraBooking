@@ -1,14 +1,16 @@
 package com.epam.capstone.util.database;
 
+import lombok.extern.slf4j.Slf4j;
 import org.intellij.lang.annotations.Language;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-
+@Slf4j
 public class CustomJdbcTemplate {
 
     private final DataSource dataSource;
@@ -25,6 +27,7 @@ public class CustomJdbcTemplate {
             return ps.executeUpdate();
 
         } catch (SQLException ex) {
+            log.error("Error executing update [{}] with params {}: {}", sql, Arrays.toString(params), ex.getMessage());
             throw new RuntimeException("Error executing update", ex);
         }
     }
@@ -55,6 +58,7 @@ public class CustomJdbcTemplate {
             return resultList;
 
         } catch (SQLException ex) {
+            log.error("Error executing query [{}] with params {}: {}", sql, Arrays.toString(params), ex.getMessage());
             throw new RuntimeException("Error executing query", ex);
         }
     }
