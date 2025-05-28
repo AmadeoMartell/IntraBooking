@@ -14,7 +14,7 @@ public class User {
     @EqualsAndHashCode.Include
     private Long userId;
 
-    private Long roleID;
+    private Long roleId;
 
     @EqualsAndHashCode.Include
     private String username;

@@ -57,7 +57,7 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
             User admin = new User();
             admin.setUsername("admin");
             admin.setPasswordHash(passwordEncoder.encode("admin"));
-            admin.setRoleID(adminRole.getRoleId());
+            admin.setRoleId(adminRole.getRoleId());
             admin.setEmail("admin@epam.com");
             admin.setFullName("Admin");
             userDao.save(admin);

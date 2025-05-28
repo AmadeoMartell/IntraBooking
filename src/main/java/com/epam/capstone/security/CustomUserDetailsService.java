@@ -35,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userDao.findByUsername(username);
         log.debug("User: {}", user);
-        Role role = roleDao.findById(user.getRoleID());
+        Role role = roleDao.findById(user.getRoleId());
 
         String roleName = "ROLE_" + role.getName().toUpperCase();
         List<GrantedAuthority> authorities =

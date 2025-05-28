@@ -11,7 +11,7 @@ public class UserRowMapper implements RowMapper<User> {
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
         return User.builder()
                 .userId(rs.getLong("user_id"))
-                .roleID(rs.getLong("role_id"))
+                .roleId(rs.getLong("role_id"))
                 .username(rs.getString("username"))
                 .passwordHash(rs.getString("password_hash"))
                 .fullName(rs.getString("full_name"))
