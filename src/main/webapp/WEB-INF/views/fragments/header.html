@@ -1,0 +1,32 @@
+<div th:fragment="header"
+     xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <header class="sticky top-0 left-0 right-0 bg-white shadow-md z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a th:href="@{/}" class="text-xl font-bold text-indigo-600"
+         th:text="#{header.brand}">
+        IntraBooking
+      </a>
+      <div class="space-x-4">
+        <a th:href="@{/login}"
+           sec:authorize="isAnonymous()"
+           class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+           th:text="#{header.login}">
+          Sign In
+        </a>
+        <form th:action="@{/logout}" method="post"
+              sec:authorize="isAuthenticated()"
+              class="inline">
+          <input type="hidden"
+                 th:name="${_csrf.parameterName}"
+                 th:value="${_csrf.token}" />
+          <button type="submit"
+                  class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                  th:text="#{header.logout}">
+            Sign Out
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+</div>
