@@ -1,4 +1,4 @@
-package com.epam.capstone.dao.rowmapper;
+package com.epam.capstone.repository.dao.rowmapper;
 
 import com.epam.capstone.model.RoomType;
 import org.springframework.jdbc.core.RowMapper;

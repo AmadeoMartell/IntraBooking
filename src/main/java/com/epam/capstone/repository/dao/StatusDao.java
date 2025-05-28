@@ -1,6 +1,6 @@
-package com.epam.capstone.dao;
+package com.epam.capstone.repository.dao;
 
-import com.epam.capstone.dao.rowmapper.StatusRowMapper;
+import com.epam.capstone.repository.dao.rowmapper.StatusRowMapper;
 import com.epam.capstone.model.Status;
 import com.epam.capstone.util.database.CustomJdbcTemplate;
 import org.intellij.lang.annotations.Language;

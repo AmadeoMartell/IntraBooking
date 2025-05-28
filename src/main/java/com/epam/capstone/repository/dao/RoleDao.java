@@ -1,6 +1,6 @@
-package com.epam.capstone.dao;
+package com.epam.capstone.repository.dao;
 
-import com.epam.capstone.dao.rowmapper.RoleRowMapper;
+import com.epam.capstone.repository.dao.rowmapper.RoleRowMapper;
 import com.epam.capstone.model.Role;
 import com.epam.capstone.util.database.CustomJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;

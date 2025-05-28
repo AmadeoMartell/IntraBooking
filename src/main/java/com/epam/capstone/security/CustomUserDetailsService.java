@@ -1,7 +1,7 @@
 package com.epam.capstone.security;
 
-import com.epam.capstone.dao.RoleDao;
-import com.epam.capstone.dao.UserDao;
+import com.epam.capstone.repository.dao.RoleDao;
+import com.epam.capstone.repository.dao.UserDao;
 import com.epam.capstone.model.Role;
 import com.epam.capstone.model.User;
 import lombok.extern.slf4j.Slf4j;

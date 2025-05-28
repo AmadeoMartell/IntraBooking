@@ -1,4 +1,4 @@
-package com.epam.capstone.dao;
+package com.epam.capstone.repository.dao;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
-package com.epam.capstone.dao;
+package com.epam.capstone.repository.dao;
 
 import com.epam.capstone.util.database.CustomJdbcTemplate;
-import com.epam.capstone.dao.rowmapper.LocationRowMapper;
+import com.epam.capstone.repository.dao.rowmapper.LocationRowMapper;
 import com.epam.capstone.model.Location;
 import org.intellij.lang.annotations.Language;
 import org.springframework.beans.factory.annotation.Autowired;

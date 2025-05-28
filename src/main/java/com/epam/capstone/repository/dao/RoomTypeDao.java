@@ -1,7 +1,7 @@
-package com.epam.capstone.dao;
+package com.epam.capstone.repository.dao;
 
 import com.epam.capstone.util.database.CustomJdbcTemplate;
-import com.epam.capstone.dao.rowmapper.RoomTypeRowMapper;
+import com.epam.capstone.repository.dao.rowmapper.RoomTypeRowMapper;
 import com.epam.capstone.model.RoomType;
 import org.intellij.lang.annotations.Language;
 import org.springframework.beans.factory.annotation.Autowired;

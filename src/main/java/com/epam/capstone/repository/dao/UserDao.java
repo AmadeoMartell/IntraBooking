@@ -1,6 +1,6 @@
-package com.epam.capstone.dao;
+package com.epam.capstone.repository.dao;
 
-import com.epam.capstone.dao.rowmapper.UserRowMapper;
+import com.epam.capstone.repository.dao.rowmapper.UserRowMapper;
 import com.epam.capstone.model.User;
 import com.epam.capstone.util.database.CustomJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
