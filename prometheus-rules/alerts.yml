@@ -1,0 +1,11 @@
+groups:
+  - name: intrabooking-app-alerts
+    rules:
+      - alert: AppDown
+        expr: up{job="intrabooking-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Сервис IntraBooking (intrabooking-app) недоступен"
+          description: "Prometheus обнаружил, что job intrabooking-app не отвечает больше одной минуты."
