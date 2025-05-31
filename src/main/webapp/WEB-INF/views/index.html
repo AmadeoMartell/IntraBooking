@@ -1,10 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en" th:lang="${#locale.language}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="#{dashboard.title}">Your Bookings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-Hello World!
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="flex-grow container mx-auto px-4 py-6">
+
+    <h1 class="text-3xl font-bold mb-6" th:text="#{dashboard.title}">Your Bookings</h1>
+
+    <div th:if="${#lists.isEmpty(bookings)}" class="text-gray-600">
+        <p th:text="#{dashboard.noBookings}">You have no bookings.</p>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(bookings)}" class="overflow-x-auto">
+
+        <table class="min-w-full bg-white rounded-lg shadow">
+            <thead class="bg-indigo-600 text-white">
+            <tr>
+                <th class="px-4 py-2 text-left" th:text="#{dashboard.date}">Date</th>
+                <th class="px-4 py-2 text-left" th:text="#{dashboard.time}">Time</th>
+                <th class="px-4 py-2 text-left" th:text="#{dashboard.purpose}">Purpose</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="b : ${bookings}" class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2"
+                    th:text="${#temporals.format(b.startTime, 'dd MMM yyyy')}">23 May 2025</td>
+                <td class="px-4 py-2"
+                    th:text="${#temporals.format(b.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(b.endTime, 'HH:mm')}">
+                    10:00 - 11:00
+                </td>
+                <td class="px-4 py-2" th:text="${b.purpose}">Lecture</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <nav class="mt-4 flex items-center" th:if="${totalPages != null and totalPages > 0}">
+            <span class="mr-4 text-gray-700"
+                  th:text="#{pagination.pageInfo(${currentPage + 1}, ${totalPages})}">
+          Страница 1 из 10
+        </span>
+
+            <ul class="inline-flex -space-x-px"
+                th:with="sp=${startPage}, ep=${endPage}">
+
+                <li th:if="${currentPage > 0}">
+                    <a th:href="@{/(page=0,size=${pageSize})}"
+                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">
+                        &lt;&lt;
+                    </a>
+                </li>
+
+                <li th:each="i : ${#numbers.sequence(sp, ep)}">
+                    <a th:href="@{/(page=${i},size=${pageSize})}"
+                       class="px-3 py-1 border"
+                       th:classappend="${i == currentPage}
+                                 ? ' bg-indigo-500 text-white'
+                                 : ' bg-white text-indigo-500'"
+                       th:text="${i + 1}">
+                        1
+                    </a>
+                </li>
+
+                <li th:if="${currentPage < totalPages - 1}">
+                    <a th:href="@{/(page=${currentPage + 1},size=${pageSize})}"
+                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">
+                        &gt;
+                    </a>
+                </li>
+
+                <li th:if="${currentPage < totalPages - 1}">
+                    <a th:href="@{/(page=${totalPages - 1},size=${pageSize})}"
+                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">
+                        &gt;&gt;
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+</main>
+
 </body>
 </html>
