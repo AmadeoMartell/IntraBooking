@@ -17,6 +17,7 @@
 
     <spring.version>6.2.7</spring.version>
     <spring.security.version>6.4.5</spring.security.version>
+    <spring-data.version>3.5.0</spring-data.version>
 
     <jdbc.postgresql.version>42.7.5</jdbc.postgresql.version>
     <hibernate.validator.version>8.0.2.Final</hibernate.validator.version>
@@ -32,6 +33,8 @@
     <slf4j-api.version>2.0.17</slf4j-api.version>
     <logback.version>1.5.18</logback.version>
     <jetbrains.annotations.version>26.0.2</jetbrains.annotations.version>
+    <jackson-databind.version>2.19.0</jackson-databind.version>
+
   </properties>
 
   <dependencies>
@@ -51,6 +54,12 @@
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
       <version>${spring.security.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-commons</artifactId>
+      <version>${spring-data.version}</version>
     </dependency>
 
     <dependency>
@@ -140,6 +149,12 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j-api.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson-databind.version}</version>
     </dependency>
   </dependencies>
 

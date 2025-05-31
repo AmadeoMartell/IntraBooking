@@ -1,0 +1,49 @@
+package com.epam.capstone.health.indicators;
+
+import com.epam.capstone.health.HealthIndicator;
+import com.epam.capstone.health.HealthStatus;
+import org.springframework.stereotype.Component;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
+import java.util.HashMap;
+import java.util.Map;
+
+@Component
+public class JvmMemoryHealthIndicator implements HealthIndicator {
+
+    private static final double USAGE_THRESHOLD = 0.8;
+
+    @Override
+    public String getName() {
+        return "jvmMemory";
+    }
+
+    @Override
+    public HealthStatus checkHealth() {
+        try {
+            MemoryUsage heapUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+            long used = heapUsage.getUsed();
+            long max = heapUsage.getMax();
+            double usageRatio = (double) used / max;
+
+            Map<String, Object> details = new HashMap<>();
+            details.put("usedBytes", used);
+            details.put("maxBytes", max);
+            details.put("usageRatio", String.format("%.2f", usageRatio));
+
+            if (usageRatio < USAGE_THRESHOLD) {
+                return new HealthStatus(getName(), HealthStatus.Status.UP, details);
+            } else {
+                details.put("error", "Heap usage above threshold");
+                return new HealthStatus(getName(), HealthStatus.Status.DOWN, details);
+            }
+        } catch (Exception ex) {
+            Map<String, Object> details = new HashMap<>();
+            details.put("exception", ex.getClass().getSimpleName());
+            details.put("message", ex.getMessage());
+            return new HealthStatus(getName(), HealthStatus.Status.DOWN, details);
+        }
+    }
+}
+
