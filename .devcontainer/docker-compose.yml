@@ -22,10 +22,12 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # JDBC на контейнер db
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/capstone
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: Zaccaro
 
+      # Параметры пула
       APP_DATASOURCE_MAX-POOL: "20"
       APP_DATASOURCE_MIN-IDLE: "5"
       APP_DATASOURCE_CONNECTION-TIMEOUT: "10000"
@@ -33,7 +35,18 @@ services:
       APP_DATASOURCE_MAX-LIFETIME: "1800000"
       APP_DATASOURCE_LEAK-DETECTION-THRESHOLD: "300000"
 
-      HEALTH_ALLOWED_IPS: "127.0.0.1,0:0:0:0:0:0:0:1"
+      HEALTH_ALLOWED_IPS: "127.0.0.1,0:0:0:0:0:0:0:1,0.0.0.0/0"
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - app
 
 volumes:
   postgres-data:
