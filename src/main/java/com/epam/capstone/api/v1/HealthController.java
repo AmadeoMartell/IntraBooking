@@ -2,6 +2,8 @@ package com.epam.capstone.api.v1;
 
 import com.epam.capstone.health.HealthIndicator;
 import com.epam.capstone.health.HealthStatus;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 
 @Controller
 @RequestMapping("/api/v1/health")
+@Slf4j
 public class HealthController {
 
     private final List<HealthIndicator> indicators;
@@ -25,7 +28,10 @@ public class HealthController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getAllHealth() {
+    public ResponseEntity<Map<String, Object>> getAllHealth(HttpServletRequest request) {
+        String remoteIp = request.getRemoteAddr();
+        log.info("HealthController called from IP = {}", remoteIp);
+
         Map<String, Object> healthMap = new HashMap<>();
         boolean anyDown = false;
 

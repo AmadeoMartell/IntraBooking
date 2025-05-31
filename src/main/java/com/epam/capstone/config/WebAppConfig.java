@@ -25,7 +25,7 @@ import java.util.Locale;
 @Configuration
 @EnableWebMvc
 @ComponentScan("com.epam.capstone")
-@Import(DatabaseConfig.class)
+@Import({DatabaseConfig.class, MetricsConfig.class})
 @PropertySource("classpath:/application.properties")
 public class WebAppConfig implements WebMvcConfigurer {
 

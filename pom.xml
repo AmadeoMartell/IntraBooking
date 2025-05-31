@@ -34,6 +34,7 @@
     <logback.version>1.5.18</logback.version>
     <jetbrains.annotations.version>26.0.2</jetbrains.annotations.version>
     <jackson-databind.version>2.19.0</jackson-databind.version>
+    <io.micrometer.version>1.15.0</io.micrometer.version>
 
   </properties>
 
@@ -155,6 +156,12 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${jackson-databind.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+      <version>${io.micrometer.version}</version>
     </dependency>
   </dependencies>
 

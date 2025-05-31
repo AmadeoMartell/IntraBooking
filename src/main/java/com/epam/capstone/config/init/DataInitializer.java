@@ -48,6 +48,7 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
         } catch (RuntimeException e) {
             adminRole = Role.builder().name("ADMIN").build();
             roleDao.save(adminRole);
+            adminRole = roleDao.findByName("ADMIN");
             log.info("Created role ADMIN");
         }
 
