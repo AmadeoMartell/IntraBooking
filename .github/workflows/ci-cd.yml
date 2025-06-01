@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Cache Maven local repo
+      - name: Cache Maven local repository
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
@@ -43,11 +43,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3
+      - name: Set up Python 3 & install Ansible
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-
       - name: Install Ansible
         run: |
           python3 -m pip install --upgrade pip
@@ -58,16 +57,29 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add EC2 host to known_hosts
+      - name: Add EC2 to known_hosts
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
         shell: bash
 
+      - name: Write dynamic inventory file
+        run: |
+          cat > inventory.ini <<EOF
+          [app]
+          ${{ secrets.SERVER_HOST }} ansible_user=${{ secrets.SERVER_USER }} ansible_port=22 ansible_ssh_private_key_file=~/.ssh/intrabooking-key.pem
+
+          [monitoring]
+          ${{ secrets.SERVER_HOST }} ansible_user=${{ secrets.SERVER_USER }} ansible_port=22 ansible_ssh_private_key_file=~/.ssh/intrabooking-key.pem
+
+          [all:vars]
+          ansible_python_interpreter=/usr/bin/python3
+          EOF
+
       - name: Run Ansible playbook
         run: |
           ansible-playbook \
-            -i ansible/inventory.ini \
+            -i inventory.ini \
             ansible/playbook.yml \
             --ssh-extra-args="-o StrictHostKeyChecking=no"
         env:
@@ -75,4 +87,5 @@ jobs:
           ANSIBLE_REMOTE_USER: ubuntu
 
       - name: Deployment complete
-        run: echo "✔️ Ansible deploy has finished successfully."
+        run: echo "✔️ Ansible deploy finished successfully."
+
