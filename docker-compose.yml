@@ -10,7 +10,8 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
-
+    networks:
+      - intrabooking_net
   app:
     container_name: intrabooking-app
     build:
@@ -21,6 +22,8 @@ services:
       - db
     ports:
       - "8080:8080"
+    networks:
+      - intrabooking_net
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/capstone
       SPRING_DATASOURCE_USERNAME: postgres
@@ -46,7 +49,8 @@ services:
       - ./prometheus-rules/:/etc/prometheus/rules/:ro
     depends_on:
       - app
-
+    networks:
+      - intrabooking_net
   alertmanager:
     container_name: alertmanager
     image: prom/alertmanager:latest
@@ -59,7 +63,8 @@ services:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
     depends_on:
       - prometheus
-
+    networks:
+      - intrabooking_net
   grafana:
     container_name: grafana
     image: grafana/grafana:latest
@@ -73,7 +78,8 @@ services:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
-
+    networks:
+      - intrabooking_net
 volumes:
   postgres-data:
   grafana-data:
