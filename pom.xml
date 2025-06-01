@@ -35,6 +35,7 @@
     <jetbrains.annotations.version>26.0.2</jetbrains.annotations.version>
     <jackson-databind.version>2.19.0</jackson-databind.version>
     <io.micrometer.version>1.15.0</io.micrometer.version>
+    <com.h2database.version>2.3.232</com.h2database.version>
 
   </properties>
 
@@ -162,6 +163,13 @@
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-prometheus</artifactId>
       <version>${io.micrometer.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${com.h2database.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
