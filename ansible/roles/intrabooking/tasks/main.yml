@@ -1,0 +1,71 @@
+---
+
+- name: Install git packages (if not already installed)
+  apt:
+    name: git
+    state: present
+    update_cache: true
+
+- name: Clone IntraBooking repository (or update if it already exists)
+  git:
+    repo: "{{ intrabooking_repo }}"
+    dest: "{{ intrabooking_dest }}"
+    version: "{{ intrabooking_branch }}"
+    force: true
+
+- name: Set permissions on IntraBooking directory
+  file:
+    path: "{{ intrabooking_dest }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+    recurse: true
+
+- name: Create .env file with environment variables
+  copy:
+    dest: "{{ app_env_file }}"
+    content: |
+      {% for key, value in app_env.items() %}
+      {{ key }}={{ value }}
+      {% endfor %}
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Force remove prometheus container if it exists
+  ansible.builtin.shell: |
+    if docker ps -a --format '{{"{{.Names}}"}}' | grep -q '^prometheus$'; then
+      docker rm -f prometheus
+    fi
+  ignore_errors: true
+  become: true
+
+- name: Force remove grafana container if it exists
+  ansible.builtin.shell: |
+    if docker ps -a --format '{{"{{.Names}}"}}' | grep -q '^grafana$'; then
+      docker rm -f grafana
+    fi
+  ignore_errors: true
+  become: true
+
+- name: Create external Docker network intrabooking_net if it does not exist
+  ansible.builtin.shell: |
+    if ! docker network ls --format '{{"{{.Name}}"}}' | grep -q '^intrabooking_net$'; then
+      docker network create intrabooking_net
+    fi
+  become: true
+  changed_when: false
+
+- name: Pull images (IntraBooking + Prometheus, etc.)
+  shell: |
+    docker compose -f "{{ intrabooking_dest }}/docker-compose.yml" --env-file "{{ app_env_file }}" pull
+  args:
+    chdir: "{{ intrabooking_dest }}"
+  become: true
+
+- name: Start IntraBooking containers (app+db+prometheus+grafana+...)
+  shell: |
+    docker compose -f "{{ intrabooking_dest }}/docker-compose.yml" --env-file "{{ app_env_file }}" up -d --remove-orphans
+  args:
+    chdir: "{{ intrabooking_dest }}"
+  become: true

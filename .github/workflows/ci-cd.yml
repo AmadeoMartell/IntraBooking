@@ -5,12 +5,16 @@ on:
     branches:
       - main
 
+env:
+  ANSIBLE_HOST_KEY_CHECKING: "False"
+
 jobs:
   build-and-test:
-    name: Build & Test on GitHub
+    name: Build & Test with Maven
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
@@ -19,11 +23,11 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Cache Maven repository
+      - name: Cache Maven local repo
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
@@ -31,46 +35,44 @@ jobs:
         run: mvn clean test -B
 
   deploy:
-    name: Build image on EC2 & Restart stack
+    name: Deploy via Ansible to EC2
     runs-on: ubuntu-latest
     needs: build-and-test
 
     steps:
-      - name: Checkout code (for git push)
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up SSH agent
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install ansible
+
+      - name: Start SSH agent and add private key
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add EC2 to known_hosts
+      - name: Add EC2 host to known_hosts
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
         shell: bash
 
-      - name: SSH → pull code, build image, restart Compose
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            set -e
+      - name: Run Ansible playbook
+        run: |
+          ansible-playbook \
+            -i ansible/inventory.ini \
+            ansible/playbook.yml \
+            --ssh-extra-args="-o StrictHostKeyChecking=no"
+        env:
+          ANSIBLE_PRIVATE_KEY_FILE: ~/.ssh/id_rsa
+          ANSIBLE_REMOTE_USER: ubuntu
 
-            if [ ! -d /opt/intrabooking/.git ]; then
-              git clone https://github.com/AmadeoMartell/IntraBooking.git /opt/intrabooking
-              cd /opt/intrabooking
-            else
-              cd /opt/intrabooking
-              git fetch origin
-              git reset --hard origin/main
-            fi
-
-            docker build -t intrabooking-app:latest .
-
-            
-            docker compose pull
-            docker compose up -d --build --remove-orphans
+      - name: Deployment complete
+        run: echo "✔️ Ansible deploy has finished successfully."

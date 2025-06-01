@@ -1,0 +1,9 @@
+---
+
+monitoring_dest: "/opt/monitoring"
+monitoring_compose_file: "{{ monitoring_dest }}/docker-compose.monitoring.yml"
+prometheus_config_src: "{{ intrabooking_dest }}/prometheus.yml"
+alerts_config_src: "{{ intrabooking_dest }}/alerts.yml"
+prometheus_config_dest: "/etc/prometheus/prometheus.yml"
+alerts_config_dest: "/etc/prometheus/alerts.yml"
+grafana_admin_password: "admin"

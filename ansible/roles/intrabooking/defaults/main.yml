@@ -1,0 +1,7 @@
+---
+
+intrabooking_repo: "https://github.com/AmadeoMartell/IntraBooking.git"
+intrabooking_branch: "main"
+intrabooking_dest: "/opt/intrabooking"
+intrabooking_compose_file: "{{ intrabooking_dest }}/docker-compose.yml"
+app_env_file: "{{ intrabooking_dest }}/.env"

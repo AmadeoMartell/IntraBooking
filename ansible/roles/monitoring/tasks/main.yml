@@ -1,0 +1,83 @@
+---
+
+- name: Ensure monitoring_dest exists
+  become: true
+  file:
+    path: "{{ monitoring_dest }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Copy docker-compose.monitoring.yml into monitoring_dest
+  copy:
+    src: "{{ playbook_dir }}/roles/monitoring/templates/docker-compose.monitoring.yml"
+    dest: "{{ monitoring_dest }}/docker-compose.monitoring.yml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+
+- name: Create /etc/prometheus directory on remote
+  become: true
+  file:
+    path: "/etc/prometheus"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Copy prometheus.yml into /etc/prometheus
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/roles/monitoring/files/prometheus.yml"
+    dest: "/etc/prometheus/prometheus.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Copy alerts.yml into /etc/prometheus
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/roles/monitoring/files/alerts.yml"
+    dest: "/etc/prometheus/alerts.yml"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Stop and remove Prometheus/Grafana stack (docker compose down)
+  become: true
+  shell: |
+    docker compose -f "{{ monitoring_dest }}/docker-compose.monitoring.yml" down --remove-orphans
+  args:
+    chdir: "{{ monitoring_dest }}"
+  ignore_errors: true
+
+- name: Force remove prometheus container if it exists
+  become: true
+  shell: |
+    if docker ps -a --format '{{"{{.Names}}"}}' | grep -qw prometheus; then
+      docker rm -f prometheus
+    fi
+  ignore_errors: true
+
+- name: Force remove grafana container if it exists
+  become: true
+  shell: |
+    if docker ps -a --format '{{"{{.Names}}"}}' | grep -qw grafana; then
+      docker rm -f grafana
+    fi
+  ignore_errors: true
+
+- name: Pull Prometheus and Grafana images
+  become: true
+  shell: |
+    docker compose -f "{{ monitoring_dest }}/docker-compose.monitoring.yml" pull
+  args:
+    chdir: "{{ monitoring_dest }}"
+
+- name: Start Prometheus + Grafana (docker compose up -d)
+  become: true
+  shell: |
+    docker compose -f "{{ monitoring_dest }}/docker-compose.monitoring.yml" up -d --remove-orphans
+  args:
+    chdir: "{{ monitoring_dest }}"

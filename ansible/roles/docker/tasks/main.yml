@@ -1,0 +1,61 @@
+---
+
+- name: Install dependencies for Docker repository
+  apt:
+    name: "{{ docker_apt_packages }}"
+    state: present
+    update_cache: true
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: "{{ docker_gpg_url }}"
+    state: present
+    keyring: /usr/share/keyrings/docker-archive-keyring.gpg
+
+- name: Add Docker repository to APT sources
+  apt_repository:
+    repo: "{{ docker_repo }}"
+    state: present
+    filename: "docker.list"
+
+- name: Install python3-pip (for Docker SDK and docker-compose)
+  apt:
+    name: python3-pip
+    state: present
+    update_cache: true
+
+- name: Install Docker SDK for Python (docker package) via pip
+  pip:
+    name: docker
+    executable: pip3
+
+- name: Install specific version of docker-compose (1.29.2) via pip
+  pip:
+    name: docker-compose==1.29.2
+    executable: pip3
+    state: present
+
+- name: Install Docker Engine
+  apt:
+    name: "{{ docker_apt_package }}"
+    state: present
+    update_cache: true
+
+- name: Ensure Docker service is started and enabled at boot
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Download latest version of Docker Compose (CLI)
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+
+- name: Ensure user {{ ansible_user }} is in the docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: true
+  when: ansible_user != "root"

@@ -1,0 +1,29 @@
+docker_apt_package: "docker-ce"
+docker_compose_version: "2.20.2"
+intrabooking_repo: "https://github.com/AmadeoMartell/IntraBooking.git"
+intrabooking_branch: "main"
+
+intrabooking_dest: "/opt/intrabooking"
+intrabooking_compose_file: "{{ intrabooking_dest }}/docker-compose.yml"
+
+app_env:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/example"
+  SPRING_DATASOURCE_USERNAME: "postgres"
+  SPRING_DATASOURCE_PASSWORD: "examplePassword"
+  APP_DATASOURCE_MAX-POOL: "20"
+  APP_DATASOURCE_MIN-IDLE: "5"
+  APP_DATASOURCE_CONNECTION-TIMEOUT: "10000"
+  APP_DATASOURCE_IDLE-TIMEOUT: "300000"
+  APP_DATASOURCE_MAX-LIFETIME: "1800000"
+  APP_DATASOURCE_LEAK-DETECTION-THRESHOLD: "300000"
+  HEALTH_ALLOWED_IPS: "0.0.0.0/0"
+
+prometheus_config_src: "{{ playbook_dir }}/roles/monitoring/files/prometheus.yml"
+alerts_config_src:     "{{ playbook_dir }}/roles/monitoring/files/alerts.yml"
+
+prometheus_config_dest: "/etc/prometheus/prometheus.yml"
+alerts_config_dest: "/etc/prometheus/alerts.yml"
+
+monitoring_dest: "/opt/monitoring"
+monitoring_compose_file: "{{ monitoring_dest }}/docker-compose.monitoring.yml"
+grafana_admin_password: "admin"
