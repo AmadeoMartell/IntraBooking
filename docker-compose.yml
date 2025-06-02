@@ -3,15 +3,18 @@ services:
     container_name: postgresdb
     image: postgres:15-alpine
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
-      POSTGRES_DB: capstone
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Zaccaro
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     networks:
       - intrabooking_net
+
   app:
     container_name: intrabooking-app
     build:
@@ -22,21 +25,23 @@ services:
       - db
     ports:
       - "8080:8080"
+    env_file:
+      - ./.env
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+
+      APP_DATASOURCE_MAX-POOL: "${APP_DATASOURCE_MAX_POOL}"
+      APP_DATASOURCE_MIN-IDLE: "${APP_DATASOURCE_MIN_IDLE}"
+      APP_DATASOURCE_CONNECTION-TIMEOUT: "${APP_DATASOURCE_CONNECTION_TIMEOUT}"
+      APP_DATASOURCE_IDLE-TIMEOUT: "${APP_DATASOURCE_IDLE_TIMEOUT}"
+      APP_DATASOURCE_MAX-LIFETIME: "${APP_DATASOURCE_MAX_LIFETIME}"
+      APP_DATASOURCE_LEAK-DETECTION-THRESHOLD: "${APP_DATASOURCE_LEAK_DETECTION_THRESHOLD}"
+
+      HEALTH_ALLOWED_IPS: "${HEALTH_ALLOWED_IPS}"
     networks:
       - intrabooking_net
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/capstone
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Zaccaro
-
-      APP_DATASOURCE_MAX-POOL: "20"
-      APP_DATASOURCE_MIN-IDLE: "5"
-      APP_DATASOURCE_CONNECTION-TIMEOUT: "10000"
-      APP_DATASOURCE_IDLE-TIMEOUT: "300000"
-      APP_DATASOURCE_MAX-LIFETIME: "1800000"
-      APP_DATASOURCE_LEAK-DETECTION-THRESHOLD: "300000"
-
-      HEALTH_ALLOWED_IPS: "127.0.0.1,0:0:0:0:0:0:0:1,0.0.0.0/0"
 
   prometheus:
     container_name: prometheus
@@ -51,6 +56,7 @@ services:
       - app
     networks:
       - intrabooking_net
+
   alertmanager:
     container_name: alertmanager
     image: prom/alertmanager:latest
@@ -65,6 +71,7 @@ services:
       - prometheus
     networks:
       - intrabooking_net
+
   grafana:
     container_name: grafana
     image: grafana/grafana:latest
@@ -72,14 +79,15 @@ services:
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: "admin"
-      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SECURITY_ADMIN_PASSWORD: "${GF_SECURITY_ADMIN_PASSWORD}"
+      GF_USERS_ALLOW_SIGN_UP: "${GF_USERS_ALLOW_SIGN_UP}"
     volumes:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
       - intrabooking_net
+
 volumes:
   postgres-data:
   grafana-data:

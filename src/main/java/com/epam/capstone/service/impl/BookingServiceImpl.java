@@ -9,19 +9,20 @@ import com.epam.capstone.repository.BookingRepository;
 import com.epam.capstone.repository.UserRepository;
 import com.epam.capstone.service.BookingService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation of {@link BookingService} that manages roles via BookingRepository and maps entities to DTOs.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class BookingServiceImpl implements BookingService {
-
-    private static final Logger log = LoggerFactory.getLogger(BookingServiceImpl.class);
 
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
