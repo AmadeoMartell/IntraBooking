@@ -1,0 +1,25 @@
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+    background-color: #E5E7EB;
+    color: #374151;
+}
+
+.status-1 {
+    background-color: #D1D5DB;
+    color: #374151;
+}
+
+.status-2 {
+    background-color: #86EFAC;
+    color: #166534;
+}
+
+.status-3 {
+    background-color: #FCA5A5;
+    color: #991B1B;
+}
+

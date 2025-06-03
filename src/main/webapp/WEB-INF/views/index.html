@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title th:text="#{dashboard.title}">Your Bookings</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/status-badge.css}" />
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
@@ -16,42 +17,52 @@
 
     <h1 class="text-3xl font-bold mb-6" th:text="#{dashboard.title}">Your Bookings</h1>
 
-    <div th:if="${#lists.isEmpty(bookings)}" class="text-gray-600">
+    <div th:if="${#lists.isEmpty(bookingViews)}" class="text-gray-600">
         <p th:text="#{dashboard.noBookings}">You have no bookings.</p>
     </div>
 
-    <div th:if="${!#lists.isEmpty(bookings)}" class="overflow-x-auto">
-
+    <div th:if="${!#lists.isEmpty(bookingViews)}" class="overflow-x-auto">
         <table class="min-w-full bg-white rounded-lg shadow">
             <thead class="bg-indigo-600 text-white">
             <tr>
                 <th class="px-4 py-2 text-left" th:text="#{dashboard.date}">Date</th>
                 <th class="px-4 py-2 text-left" th:text="#{dashboard.time}">Time</th>
                 <th class="px-4 py-2 text-left" th:text="#{dashboard.purpose}">Purpose</th>
+                <th class="px-4 py-2 text-left" th:text="#{dashboard.room}">Room</th>
+                <th class="px-4 py-2 text-left" th:text="#{dashboard.location}">Location</th>
+                <th class="px-4 py-2 text-left" th:text="#{dashboard.status}">Status</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="b : ${bookings}" class="border-b hover:bg-gray-50">
+            <tr th:each="b : ${bookingViews}" class="border-b hover:bg-gray-50">
                 <td class="px-4 py-2"
-                    th:text="${#temporals.format(b.startTime, 'dd MMM yyyy')}">23 May 2025</td>
+                    th:text="${#temporals.format(b.booking.startTime, 'dd MMM yyyy')}">
+                    23 May 2025
+                </td>
                 <td class="px-4 py-2"
-                    th:text="${#temporals.format(b.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(b.endTime, 'HH:mm')}">
+                    th:text="${#temporals.format(b.booking.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(b.booking.endTime, 'HH:mm')}">
                     10:00 - 11:00
                 </td>
-                <td class="px-4 py-2" th:text="${b.purpose}">Lecture</td>
+                <td class="px-4 py-2" th:text="${b.booking.purpose}">Lecture</td>
+                <td class="px-4 py-2" th:text="${b.room.name}">Room A</td>
+                <td class="px-4 py-2" th:text="${b.location.name}">Main Campus</td>
+                <td class="px-4 py-2">
+                    <span th:class="'status-badge status-' + ${b.status.statusId}"
+                          th:text="${b.status.name}">
+                        StatusName
+                    </span>
+                </td>
             </tr>
             </tbody>
         </table>
 
-        <nav class="mt-4 flex items-center" th:if="${totalPages != null and totalPages > 0}">
+        <nav class="mt-4 flex items-center" th:if="${totalPages > 0}">
             <span class="mr-4 text-gray-700"
                   th:text="#{pagination.pageInfo(${currentPage + 1}, ${totalPages})}">
-          Страница 1 из 10
-        </span>
+                Page 1 of 10
+            </span>
 
-            <ul class="inline-flex -space-x-px"
-                th:with="sp=${startPage}, ep=${endPage}">
-
+            <ul class="inline-flex -space-x-px" th:with="sp=${startPage}, ep=${endPage}">
                 <li th:if="${currentPage > 0}">
                     <a th:href="@{/(page=0,size=${pageSize})}"
                        class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">
@@ -85,7 +96,6 @@
                 </li>
             </ul>
         </nav>
-
     </div>
 </main>
 

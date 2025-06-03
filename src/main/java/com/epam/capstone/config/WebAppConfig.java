@@ -107,6 +107,13 @@ public class WebAppConfig implements WebMvcConfigurer {
         return new MappingJackson2HttpMessageConverter(new ObjectMapper());
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry
+                .addResourceHandler("/css/**")
+                .addResourceLocations("/WEB-INF/css/");
+    }
+
     @Bean
     public StringHttpMessageConverter stringMessageConverter() {
         return new StringHttpMessageConverter();

@@ -1,7 +1,14 @@
 package com.epam.capstone.mvc;
 
 import com.epam.capstone.dto.BookingDto;
+import com.epam.capstone.dto.view.BookingView;
 import com.epam.capstone.service.BookingService;
+import com.epam.capstone.service.LocationService;
+import com.epam.capstone.service.RoomService;
+import com.epam.capstone.service.StatusService;
+import com.epam.capstone.util.PaginationInfo;
+import com.epam.capstone.util.PaginationUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,15 +18,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class DashboardController {
 
     private final BookingService bookingService;
-
-    public DashboardController(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+    private final RoomService roomService;
+    private final LocationService locationService;
+    private final StatusService statusService;
 
     @GetMapping("/")
     public String dashboard(
@@ -33,37 +41,29 @@ public class DashboardController {
         Pageable pageable = PageRequest.of(page, size);
         Page<BookingDto> bookingsPage = bookingService.getBookingsByUsername(username, pageable);
 
-        int currentPage = bookingsPage.getNumber();
-        int totalPages  = bookingsPage.getTotalPages();
-        int pageSize    = bookingsPage.getSize();
-
+        int totalPages = bookingsPage.getTotalPages();
         if (totalPages > 0 && page >= totalPages) {
             return "redirect:/?page=" + (totalPages - 1) + "&size=" + size;
         }
 
-        int startPage, endPage;
-        if (totalPages <= 3) {
-            startPage = 0;
-            endPage   = totalPages - 1;
-        } else {
-            if (currentPage == 0) {
-                startPage = 0;
-                endPage   = 2;
-            } else if (currentPage == totalPages - 1) {
-                startPage = totalPages - 3;
-                endPage   = totalPages - 1;
-            } else {
-                startPage = currentPage - 1;
-                endPage   = currentPage + 1;
-            }
-        }
+        PaginationInfo pagination = PaginationUtil.getPaginationInfo(bookingsPage, 3);
 
-        model.addAttribute("bookings",    bookingsPage.getContent());
-        model.addAttribute("currentPage", currentPage);
-        model.addAttribute("totalPages",  totalPages);
-        model.addAttribute("pageSize",    pageSize);
-        model.addAttribute("startPage",   startPage);
-        model.addAttribute("endPage",     endPage);
+        List<BookingView> bookingViews = bookingsPage.getContent().stream()
+                .map(booking -> {
+                    var room = roomService.getRoomById(booking.roomId());
+                    var location = locationService.getLocationById(room.locationId());
+                    var status = statusService.getStatusById(booking.statusId());
+                    return new BookingView(booking, room, location, status);
+                })
+                .toList();
+
+        model.addAttribute("bookingViews", bookingViews);
+        model.addAttribute("currentPage", pagination.getCurrentPage());
+        model.addAttribute("totalPages", pagination.getTotalPages());
+        model.addAttribute("pageSize", pagination.getPageSize());
+        model.addAttribute("startPage", pagination.getStartPage());
+        model.addAttribute("endPage", pagination.getEndPage());
+        model.addAttribute("pageNumbers", pagination.getPageNumbers());
 
         return "index";
     }
