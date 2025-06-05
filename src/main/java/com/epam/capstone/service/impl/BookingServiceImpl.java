@@ -107,5 +107,13 @@ public class BookingServiceImpl implements BookingService {
 
         deleteBooking(bookingId);
     }
+
+    @Override
+    public Page<BookingDto> getBookingsByUsernameAndStatus(String username, Short statusId, Pageable pageable) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found: " + username));
+        Page<Booking> page = bookingRepository.findAllByUserIdAndStatusId(user.getUserId(), statusId, pageable);
+        return page.map(bookingMapper::toDto);
+    }
 }
 

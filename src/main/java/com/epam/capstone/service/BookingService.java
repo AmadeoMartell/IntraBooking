@@ -75,4 +75,14 @@ public interface BookingService {
      * @param bookingId ID of the booking to delete for that user
      */
     void deleteBookingForUser(String username, Long bookingId);
+
+    /**
+     * Retrieve bookings for a user by their username and Status with pagination.
+     *
+     * @param username  username of the user
+     * @param statusId ID of the booking to delete for that user
+     * @param pageable pagination information
+     * @return page of booking DTOs for the given username
+     */
+    Page<BookingDto> getBookingsByUsernameAndStatus(String username, Short statusId, Pageable pageable);
 }

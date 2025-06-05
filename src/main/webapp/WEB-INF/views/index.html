@@ -6,21 +6,75 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title th:text="#{dashboard.title}">Your Bookings</title>
+
+    <!-- Tailwind CDN (если нужен) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Ваш кастомный CSS для бейджей статусов -->
     <link rel="stylesheet" th:href="@{/css/status-badge.css}" />
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
+<!-- Фрагмент header (если есть) -->
 <div th:replace="~{fragments/header :: header}"></div>
 
 <main class="flex-grow container mx-auto px-4 py-6">
 
-    <h1 class="text-3xl font-bold mb-6" th:text="#{dashboard.title}">Your Bookings</h1>
+    <h1 class="text-3xl font-bold mb-4" th:text="#{dashboard.title}">Your Bookings</h1>
 
+    <!-- ==== Форма фильтрации по статусу и сортировки по дате ==== -->
+    <form method="get" class="flex flex-wrap gap-4 mb-6 items-end">
+        <!-- Фильтр по статусу -->
+        <div>
+            <label for="status" class="block text-sm font-medium text-gray-700"
+                   th:text="#{dashboard.filterStatus}">Filter by Status</label>
+            <select id="status" name="status"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300
+                               focus:outline-none focus:ring-indigo-500 focus:border-indigo-500
+                               sm:text-sm rounded-md">
+                <option value="" th:text="#{dashboard.allStatuses}">All</option>
+                <option th:each="st : ${allStatuses}"
+                        th:value="${st.statusId}"
+                        th:text="${st.name}"
+                        th:selected="${st.statusId == selectedStatus}">
+                    <!-- текст статуса -->
+                </option>
+            </select>
+        </div>
+
+        <!-- Сортировка по дате/времени -->
+        <div>
+            <label for="sortDir" class="block text-sm font-medium text-gray-700"
+                   th:text="#{dashboard.sortByDate}">Sort by Date</label>
+            <select id="sortDir" name="sortDir"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300
+                               focus:outline-none focus:ring-indigo-500 focus:border-indigo-500
+                               sm:text-sm rounded-md">
+                <option th:value="asc"
+                        th:text="#{dashboard.ascending}"
+                        th:selected="${sortDir == 'asc'}">Ascending</option>
+                <option th:value="desc"
+                        th:text="#{dashboard.descending}"
+                        th:selected="${sortDir == 'desc'}">Descending</option>
+            </select>
+        </div>
+
+        <div>
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md
+                               font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2
+                               focus:ring-offset-2 focus:ring-indigo-500"
+                    th:text="#{dashboard.apply}">Apply
+            </button>
+        </div>
+    </form>
+    <!-- ==== /Форма ==== -->
+
+    <!-- Если нет бронирований -->
     <div th:if="${#lists.isEmpty(bookingViews)}" class="text-gray-600">
         <p th:text="#{dashboard.noBookings}">You have no bookings.</p>
     </div>
 
+    <!-- Если есть бронирования, выводим таблицу -->
     <div th:if="${!#lists.isEmpty(bookingViews)}" class="overflow-x-auto">
         <table class="min-w-full bg-white rounded-lg shadow">
             <thead class="bg-indigo-600 text-white">
@@ -35,69 +89,67 @@
             </thead>
             <tbody>
             <tr th:each="b : ${bookingViews}" class="border-b hover:bg-gray-50">
+                <!-- Дата -->
                 <td class="px-4 py-2"
                     th:text="${#temporals.format(b.booking.startTime, 'dd MMM yyyy')}">
                     23 May 2025
                 </td>
+                <!-- Время: используем Thymeleaf Literal Syntax (|…|) -->
                 <td class="px-4 py-2"
-                    th:text="${#temporals.format(b.booking.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(b.booking.endTime, 'HH:mm')}">
+                    th:text="|${#temporals.format(b.booking.startTime, 'HH:mm')} - ${#temporals.format(b.booking.endTime, 'HH:mm')}|">
                     10:00 - 11:00
                 </td>
+                <!-- Цель -->
                 <td class="px-4 py-2" th:text="${b.booking.purpose}">Lecture</td>
+                <!-- Комната -->
                 <td class="px-4 py-2" th:text="${b.room.name}">Room A</td>
+                <!-- Локация -->
                 <td class="px-4 py-2" th:text="${b.location.name}">Main Campus</td>
+                <!-- Статус -->
                 <td class="px-4 py-2">
-                    <span th:class="'status-badge status-' + ${b.status.statusId}"
-                          th:text="${b.status.name}">
-                        StatusName
-                    </span>
+                            <span th:class="'status-badge status-' + ${b.status.statusId}"
+                                  th:text="${b.status.name}">StatusName</span>
                 </td>
             </tr>
             </tbody>
         </table>
 
+        <!-- ========== Пагинация ========== -->
         <nav class="mt-4 flex items-center" th:if="${totalPages > 0}">
-            <span class="mr-4 text-gray-700"
-                  th:text="#{pagination.pageInfo(${currentPage + 1}, ${totalPages})}">
-                Page 1 of 10
-            </span>
+                <span class="mr-4 text-gray-700"
+                      th:text="#{pagination.pageInfo(${currentPage + 1}, ${totalPages})}">Page 1 of 10</span>
 
-            <ul class="inline-flex -space-x-px" th:with="sp=${startPage}, ep=${endPage}">
+            <ul class="inline-flex -space-x-px">
+                <!-- Ссылка «<<» на первую страницу -->
                 <li th:if="${currentPage > 0}">
-                    <a th:href="@{/(page=0,size=${pageSize})}"
-                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">
-                        &lt;&lt;
-                    </a>
+                    <a th:href="@{/(page=0,size=${pageSize},status=${selectedStatus},sortDir=${sortDir})}"
+                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&lt;&lt;</a>
                 </li>
 
-                <li th:each="i : ${#numbers.sequence(sp, ep)}">
-                    <a th:href="@{/(page=${i},size=${pageSize})}"
-                       class="px-3 py-1 border"
-                       th:classappend="${i == currentPage}
-                                 ? ' bg-indigo-500 text-white'
-                                 : ' bg-white text-indigo-500'"
-                       th:text="${i + 1}">
-                        1
-                    </a>
+                <!-- Ссылки на числа страниц -->
+                <li th:each="i : ${pageNumbers}">
+                    <a th:href="@{/(page=${i},size=${pageSize},status=${selectedStatus},sortDir=${sortDir})}"
+                       th:class="${i == currentPage}
+                                      ? 'px-3 py-1 border bg-indigo-500 text-white'
+                                      : 'px-3 py-1 border bg-white text-indigo-500'"
+                       th:text="${i + 1}">1</a>
                 </li>
 
+                <!-- Ссылка «>» на следующую страницу -->
                 <li th:if="${currentPage < totalPages - 1}">
-                    <a th:href="@{/(page=${currentPage + 1},size=${pageSize})}"
-                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">
-                        &gt;
-                    </a>
+                    <a th:href="@{/(page=${currentPage + 1},size=${pageSize},status=${selectedStatus},sortDir=${sortDir})}"
+                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;</a>
                 </li>
 
+                <!-- Ссылка «>>» на последнюю страницу -->
                 <li th:if="${currentPage < totalPages - 1}">
-                    <a th:href="@{/(page=${totalPages - 1},size=${pageSize})}"
-                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">
-                        &gt;&gt;
-                    </a>
+                    <a th:href="@{/(page=${totalPages - 1},size=${pageSize},status=${selectedStatus},sortDir=${sortDir})}"
+                       class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;&gt;</a>
                 </li>
             </ul>
         </nav>
+        <!-- ========== /Пагинация ========== -->
     </div>
 </main>
-
 </body>
 </html>

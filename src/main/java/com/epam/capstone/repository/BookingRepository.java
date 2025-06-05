@@ -1,8 +1,8 @@
 package com.epam.capstone.repository;
 
+import com.epam.capstone.model.Booking;
 import com.epam.capstone.repository.dao.BookingDao;
 import com.epam.capstone.repository.dao.rowmapper.BookingRowMapper;
-import com.epam.capstone.model.Booking;
 import com.epam.capstone.repository.helper.QueryContainsMatcher;
 import com.epam.capstone.util.database.CustomJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,7 @@ import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -36,9 +37,19 @@ public class BookingRepository {
                      created_at, updated_at
                 FROM bookings
                WHERE user_id = ?
-              ORDER BY booking_id
+              ORDER BY start_time
                LIMIT ? OFFSET ?
             """;
+    @Language("SQL")
+    private static final String SELECT_PAGE_BY_USER_DESC = """
+      SELECT booking_id, user_id, room_id, status_id,
+             start_time, end_time, purpose,
+             created_at, updated_at
+        FROM bookings
+       WHERE user_id = ?
+    ORDER BY start_time DESC
+       LIMIT ? OFFSET ?
+    """;
     @Language("SQL")
     private static final String COUNT_BY_ROOM =
             "SELECT COUNT(*) FROM bookings WHERE room_id = ?";
@@ -91,6 +102,30 @@ public class BookingRepository {
             ORDER BY booking_id
                LIMIT ? OFFSET ?
             """;
+    @Language("SQL")
+    private static final String COUNT_BY_USER_AND_STATUS =
+            "SELECT COUNT(*) FROM bookings WHERE user_id = ? AND status_id = ?";
+    @Language("SQL")
+    private static final String SELECT_PAGE_BY_USER_AND_STATUS_ASC = """
+              SELECT booking_id, user_id, room_id, status_id,
+                     start_time, end_time, purpose,
+                     created_at, updated_at
+                FROM bookings
+               WHERE user_id = ? AND status_id = ?
+            ORDER BY start_time ASC
+               LIMIT ? OFFSET ?
+            """;
+    @Language("SQL")
+    private static final String SELECT_PAGE_BY_USER_AND_STATUS_DESC = """
+              SELECT booking_id, user_id, room_id, status_id,
+                     start_time, end_time, purpose,
+                     created_at, updated_at
+                FROM bookings
+               WHERE user_id = ? AND status_id = ?
+            ORDER BY start_time DESC
+               LIMIT ? OFFSET ?
+            """;
+
     private final BookingDao bookingDao;
     private final CustomJdbcTemplate jdbc;
 
@@ -163,19 +198,16 @@ public class BookingRepository {
     }
 
     public Page<Booking> findAllByUserId(Long userId, Pageable pg) {
-        try {
-            Long total = jdbc.queryForObject(
-                    COUNT_BY_USER, LONG_MAPPER, userId
-            );
-            List<Booking> list = jdbc.query(
-                    SELECT_PAGE_BY_USER, ROW_MAPPER,
-                    userId, pg.getPageSize(), pg.getOffset()
-            );
-            return new PageImpl<>(list, pg, total != null ? total : 0L);
-        } catch (RuntimeException e) {
-            log.error("findAllByUserId({}, {}) failed", userId, pg, e);
-            return new PageImpl<>(Collections.emptyList(), pg, 0);
-        }
+        Sort.Order order = pg.getSort().getOrderFor("startTime");
+        boolean descending = (order != null && order.getDirection().isDescending());
+        String sql = descending ? SELECT_PAGE_BY_USER_DESC : SELECT_PAGE_BY_USER;
+
+        Long total = jdbc.queryForObject(COUNT_BY_USER, LONG_MAPPER, userId);
+        List<Booking> list = jdbc.query(
+                sql, ROW_MAPPER,
+                userId, pg.getPageSize(), pg.getOffset()
+        );
+        return new PageImpl<>(list, pg, total != null ? total : 0L);
     }
 
     public Page<Booking> findAllByRoomId(Long roomId, Pageable pg) {
@@ -206,6 +238,30 @@ public class BookingRepository {
             return new PageImpl<>(list, pg, total != null ? total : 0L);
         } catch (RuntimeException e) {
             log.error("findAllByStatusId({}, {}) failed", statusId, pg, e);
+            return new PageImpl<>(Collections.emptyList(), pg, 0);
+        }
+    }
+
+    public Page<Booking> findAllByUserIdAndStatusId(
+            Long userId, Short statusId, Pageable pg) {
+        try {
+            Sort.Order order = pg.getSort().getOrderFor("startTime");
+            boolean descending = (order != null && order.getDirection().isDescending());
+
+            String selectSql = descending
+                    ? SELECT_PAGE_BY_USER_AND_STATUS_DESC
+                    : SELECT_PAGE_BY_USER_AND_STATUS_ASC;
+
+            Long total = jdbc.queryForObject(
+                    COUNT_BY_USER_AND_STATUS, LONG_MAPPER, userId, statusId
+            );
+            List<Booking> list = jdbc.query(
+                    selectSql, ROW_MAPPER,
+                    userId, statusId, pg.getPageSize(), pg.getOffset()
+            );
+            return new PageImpl<>(list, pg, total != null ? total : 0L);
+        } catch (RuntimeException e) {
+            log.error("findAllByUserIdAndStatusId({}, {}, {}) failed", userId, statusId, pg, e);
             return new PageImpl<>(Collections.emptyList(), pg, 0);
         }
     }

@@ -8,11 +8,13 @@ import com.epam.capstone.util.database.CustomJdbcTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -39,6 +41,23 @@ public class StatusRepository {
                WHERE name ILIKE ?
             ORDER BY status_id
                LIMIT ? OFFSET ?
+            """;
+    @Language("SQL")
+    private static final String SELECT_ALL_STATUSES = """
+            SELECT status_id, name
+              FROM statuses
+            ORDER BY status_id
+            """;
+
+    @Language("SQL")
+    private static final String COUNT_STATUSES = "SELECT COUNT(*) FROM statuses";
+
+    @Language("SQL")
+    private static final String SELECT_PAGE_STATUSES = """
+            SELECT status_id, name
+              FROM statuses
+            ORDER BY status_id
+            LIMIT ? OFFSET ?
             """;
     private final StatusDao statusDao;
     private final CustomJdbcTemplate jdbc;
@@ -78,10 +97,19 @@ public class StatusRepository {
 
     public Page<Status> findAll(Pageable pg) {
         try {
-            return QueryContainsMatcher.pageList(statusDao.findAll(), pg);
+            if (pg.isUnpaged()) {
+                List<Status> all = statusDao.findAll();
+                return new PageImpl<>(all);
+            }
+            Long total = jdbc.queryForObject(COUNT_STATUSES, LONG_MAPPER);
+            List<Status> list = jdbc.query(
+                    SELECT_PAGE_STATUSES, ROW_MAPPER,
+                    pg.getPageSize(), pg.getOffset()
+            );
+            return new PageImpl<>(list, pg, total != null ? total : 0L);
         } catch (RuntimeException e) {
             log.error("findAll(Pageable) failed", e);
-            return QueryContainsMatcher.pageList(Collections.emptyList(), pg);
+            return new PageImpl<>(Collections.emptyList(), pg, 0);
         }
     }
 
