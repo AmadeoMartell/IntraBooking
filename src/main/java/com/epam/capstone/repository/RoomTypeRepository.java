@@ -65,6 +65,20 @@ public class RoomTypeRepository {
             ORDER BY type_id
                LIMIT ? OFFSET ?
             """;
+    @Language("SQL")
+    private static final String SELECT_TYPES_FOR_LOCATION = """
+        SELECT rt.type_id,
+               rt.name,
+               rt.capacity,
+               rt.description
+          FROM room_types rt
+          JOIN rooms r
+            ON rt.type_id = r.type_id
+         WHERE r.location_id = ?
+         GROUP BY rt.type_id, rt.name, rt.capacity, rt.description
+         ORDER BY rt.name
+        """;
+
     private final RoomTypeDao roomTypeDao;
     private final CustomJdbcTemplate jdbc;
 
@@ -82,7 +96,19 @@ public class RoomTypeRepository {
             return Optional.empty();
         }
     }
-
+    /**
+     * Returns all RoomType entities that have at least one room in the given location.
+     *
+     * @param locationId ID of the location
+     * @return a List of RoomType (entity) objects
+     */
+    public List<RoomType> findByLocationId(Long locationId) {
+        try {
+            return jdbc.query(SELECT_TYPES_FOR_LOCATION, ROW_MAPPER, locationId);
+        } catch (Exception ex) {
+            return Collections.emptyList();
+        }
+    }
     public boolean existsById(Integer id) {
         try {
             return roomTypeDao.findById(id) != null;
@@ -98,6 +124,15 @@ public class RoomTypeRepository {
         } catch (RuntimeException e) {
             log.error("count() failed", e);
             return 0L;
+        }
+    }
+
+    public List<RoomType> findAll() {
+        try {
+            return roomTypeDao.findAll();
+        } catch (RuntimeException e) {
+            log.error("findAll() failed", e);
+            return Collections.emptyList();
         }
     }
 

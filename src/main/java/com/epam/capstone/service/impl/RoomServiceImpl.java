@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Implementation of {@link RoomService} that manages rooms via RoomRepository and maps entities to DTOs.
  */
@@ -73,5 +75,34 @@ public class RoomServiceImpl implements RoomService {
     public Page<RoomDto> getRoomsByType(Integer typeId, Pageable pageable) {
         Page<Room> page = roomRepository.findByTypeId(typeId, pageable);
         return page.map(roomMapper::toDto);
+    }
+
+    @Override
+    public long countRoomsByLocationAndType(Long locationId, Long typeId) {
+        return roomRepository.countByLocationAndType(locationId, typeId);
+    }
+
+    @Override
+    public Page<RoomDto> findRoomsByLocationAndTypeAndName(
+            Long locationId,
+            Integer typeId,
+            String nameFilter,
+            Pageable pageable
+    ) {
+        Page<Room> roomPage = roomRepository.findByLocationAndTypeAndName(
+                locationId,
+                typeId,
+                nameFilter,
+                pageable
+        );
+        return roomPage.map(roomMapper::toDto);
+    }
+
+    @Override
+    public List<RoomDto> getRoomsByLocationAndType(Long locationId, Integer typeId) {
+        List<Room> rooms = roomRepository.findRoomsListByLocationAndType(locationId, typeId);
+        return rooms.stream()
+                .map(roomMapper::toDto)
+                .toList();
     }
 }

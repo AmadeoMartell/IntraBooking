@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en" th:lang="${#locale.language}">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="#{booking.step3.title}">Step 3: Purpose &amp; Time</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<header th:insert="~{fragments/header :: header}"></header>
+
+<main class="container mx-auto px-4 py-8 flex-grow">
+    <h2 class="text-2xl font-semibold mb-6" th:text="#{booking.step3.header}">
+        Step 3: Enter Purpose &amp; Time
+    </h2>
+
+    <form th:action="@{/booking/step3}"
+          th:object="${bookingForm}"
+          method="post"
+          class="bg-white p-6 rounded-lg shadow-lg space-y-6">
+
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div>
+            <label for="purpose" class="block text-sm font-medium text-gray-700">
+                <span th:text="#{booking.step3.purposeLabel}">Purpose of booking</span>
+            </label>
+            <textarea id="purpose"
+                      th:field="*{purpose}"
+                      rows="3"
+                      class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2
+                             focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </textarea>
+            <p th:if="${#fields.hasErrors('purpose')}"
+               th:each="err : ${#fields.errors('purpose')}"
+               class="mt-1 text-sm text-red-600"
+               th:text="${err}"></p>
+        </div>
+
+        <div>
+            <label for="bookingDate" class="block text-sm font-medium text-gray-700">
+                <span th:text="#{booking.step3.dateLabel}">Select Date</span>
+            </label>
+            <input id="bookingDate"
+                   type="date"
+                   class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2
+                          focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                   th:attr="min=${minDateTime.toLocalDate()},max=${maxDateTime.toLocalDate()}"/>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="startTime" class="block text-sm font-medium text-gray-700">
+                    <span th:text="#{booking.step3.startLabel}">Start Time</span>
+                </label>
+                <input id="startTime"
+                       type="time"
+                       class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2
+                              focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                <p th:if="${#fields.hasErrors('startDateTime')}"
+                   th:each="err : ${#fields.errors('startDateTime')}"
+                   class="mt-1 text-sm text-red-600"
+                   th:text="${err}"></p>
+            </div>
+
+            <div>
+                <label for="endTime" class="block text-sm font-medium text-gray-700">
+                    <span th:text="#{booking.step3.endLabel}">End Time</span>
+                </label>
+                <input id="endTime"
+                       type="time"
+                       class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2
+                              focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
+                <p th:if="${#fields.hasErrors('endDateTime')}"
+                   th:each="err : ${#fields.errors('endDateTime')}"
+                   class="mt-1 text-sm text-red-600"
+                   th:text="${err}"></p>
+            </div>
+        </div>
+
+        <input type="hidden" th:field="*{startDateTime}" id="startDateTimeHidden"/>
+        <input type="hidden" th:field="*{endDateTime}"   id="endDateTimeHidden"/>
+
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <ul class="list-disc list-inside text-sm text-red-600">
+                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+        <div class="flex justify-between">
+            <a th:href="@{/booking/step2}"
+               class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">
+                <span th:text="#{booking.prev}">Prev</span>
+            </a>
+            <button type="submit"
+                    class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                <span th:text="#{booking.step3.bookButton}">Book</span>
+            </button>
+        </div>
+    </form>
+</main>
+
+<script>
+    const dateEl   = document.getElementById('bookingDate');
+    const startEl  = document.getElementById('startTime');
+    const endEl    = document.getElementById('endTime');
+    const hidStart = document.getElementById('startDateTimeHidden');
+    const hidEnd   = document.getElementById('endDateTimeHidden');
+
+    function updateHidden() {
+        const d = dateEl.value;
+        if (!d) return;
+        if (startEl.value) hidStart.value = d + 'T' + startEl.value;
+        if (endEl.value)   hidEnd.value   = d + 'T' + endEl.value;
+    }
+
+    [dateEl, startEl, endEl].forEach(el =>
+        el.addEventListener('input', updateHidden)
+    );
+</script>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -12,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Implementation of {@link RoomTypeService} that manages room types via RoomTypeRepository and maps entities to DTOs.
  */
@@ -36,6 +39,20 @@ public class RoomTypeServiceImpl implements RoomTypeService {
         RoomType roomType = roomTypeRepository.findById(typeId)
                 .orElseThrow(() -> new NotFoundException("RoomType with id=" + typeId + " not found"));
         return roomTypeMapper.toDto(roomType);
+    }
+
+    @Override
+    public List<RoomTypeDto> getAvailableRoomTypesForLocation(Long locationId) {
+        List<RoomType> types = roomTypeRepository.findByLocationId(locationId);
+        return types.stream()
+                .map(roomTypeMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RoomTypeDto> getAllRoomTypes() {
+        List<RoomType> roomType = roomTypeRepository.findAll();
+        return roomType.stream().map(roomTypeMapper::toDto).collect(Collectors.toList());
     }
 
     @Override

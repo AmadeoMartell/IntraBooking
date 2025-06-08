@@ -40,7 +40,7 @@ public class DashboardController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "status", required = false) Short statusId,
-            @RequestParam(name = "sortDir", defaultValue = "asc") String sortDir
+            @RequestParam(name = "sortDir", defaultValue = "desc") String sortDir
     ) {
         String username = principal.getName();
 

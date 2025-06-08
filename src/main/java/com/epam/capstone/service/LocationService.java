@@ -4,6 +4,8 @@ import com.epam.capstone.dto.LocationDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service interface for managing locations.
  */
@@ -32,6 +34,13 @@ public interface LocationService {
      * @return page of location DTOs
      */
     Page<LocationDto> getAllLocations(Pageable pageable);
+
+    /**
+     * Retrieve all locations as List<LocationDto>.
+     *
+     * @return list of locations DTOs
+     */
+    List<LocationDto> getAllLocations();
 
     /**
      * Update an existing location.

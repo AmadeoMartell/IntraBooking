@@ -48,4 +48,6 @@ public interface StatusService {
      * @param statusId ID of the status to delete
      */
     void deleteStatus(Short statusId);
+
+    StatusDto getStatusByName(String name);
 }

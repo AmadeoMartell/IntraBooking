@@ -4,6 +4,8 @@ import com.epam.capstone.dto.RoomTypeDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service interface for managing room types.
  */
@@ -24,6 +26,19 @@ public interface RoomTypeService {
      * @return DTO of the found room type
      */
     RoomTypeDto getRoomTypeById(Integer typeId);
+
+    /**
+     * Retrieve only those room types which have at least one room in the given location.
+     *
+     * @param locationId the ID of the location
+     * @return list of available RoomTypeDto
+     */
+    List<RoomTypeDto> getAvailableRoomTypesForLocation(Long locationId);
+
+    /**
+     * Retrieve all room types (no pagination).
+     */
+    List<RoomTypeDto> getAllRoomTypes();
 
     /**
      * Retrieve all room types with pagination.

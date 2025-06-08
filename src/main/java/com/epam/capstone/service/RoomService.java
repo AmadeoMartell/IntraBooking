@@ -4,6 +4,8 @@ import com.epam.capstone.dto.RoomDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service interface for managing rooms.
  */
@@ -66,4 +68,25 @@ public interface RoomService {
      * @return page of room DTOs
      */
     Page<RoomDto> getRoomsByType(Integer typeId, Pageable pageable);
+
+
+    long countRoomsByLocationAndType(Long locationId, Long typeId);
+
+    /**
+     * Retrieve rooms filtered by location ID.
+     *
+     * @param locationId ID of the location
+     * @param typeId ID of the roomType
+     * @param nameFilter filter for find room by name
+     * @param pageable   pagination information
+     * @return page of room DTOs
+     */
+    Page<RoomDto> findRoomsByLocationAndTypeAndName(
+            Long locationId,
+            Integer typeId,
+            String nameFilter,
+            Pageable pageable
+    );
+
+    List<RoomDto> getRoomsByLocationAndType(Long locationId, Integer typeId);
 }

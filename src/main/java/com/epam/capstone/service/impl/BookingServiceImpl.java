@@ -8,12 +8,15 @@ import com.epam.capstone.model.User;
 import com.epam.capstone.repository.BookingRepository;
 import com.epam.capstone.repository.UserRepository;
 import com.epam.capstone.service.BookingService;
+import com.epam.capstone.service.StatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * Implementation of {@link BookingService} that manages roles via BookingRepository and maps entities to DTOs.
@@ -27,6 +30,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
+    private final StatusService statusService;
 
     @Override
     @Transactional
@@ -114,6 +118,12 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("User not found: " + username));
         Page<Booking> page = bookingRepository.findAllByUserIdAndStatusId(user.getUserId(), statusId, pageable);
         return page.map(bookingMapper::toDto);
+    }
+
+    @Override
+    public boolean isRoomAvailable(Long roomId, LocalDateTime start, LocalDateTime end) {
+        long overlapping = bookingRepository.countOverlappingBookings(roomId, start, end);
+        return overlapping == 0;
     }
 }
 

@@ -64,6 +64,40 @@ public class RoomRepository {
             ORDER BY room_id
                LIMIT ? OFFSET ?
             """;
+    @Language("SQL")
+    private static final String COUNT_BY_LOCATION_AND_TYPE =
+            "SELECT COUNT(*) FROM rooms WHERE location_id = ? AND type_id = ?";
+    @Language("SQL")
+    private static final String SELECT_PAGE_BY_LOCATION_AND_TYPE = """
+            SELECT room_id, location_id, type_id, name, capacity, description
+              FROM rooms
+             WHERE location_id = ?
+               AND type_id = ?
+          ORDER BY name
+             LIMIT ? OFFSET ?
+            """;
+    @Language("SQL")
+    private static final String SELECT_LIST_BY_LOCATION_AND_TYPE = """
+            SELECT room_id, location_id, type_id, name, capacity, description
+              FROM rooms
+             WHERE location_id = ?
+               AND type_id = ?
+            ORDER BY name
+            """;
+    @Language("SQL")
+    private static final String COUNT_BY_LOCATION_AND_TYPE_AND_NAME =
+            "SELECT COUNT(*) FROM rooms WHERE location_id = ? AND type_id = ? AND name ILIKE ?";
+
+    @Language("SQL")
+    private static final String SELECT_PAGE_BY_LOCATION_AND_TYPE_AND_NAME = """
+            SELECT room_id, location_id, type_id, name, capacity, description
+              FROM rooms
+             WHERE location_id = ?
+               AND type_id = ?
+               AND name ILIKE ?
+          ORDER BY name
+             LIMIT ? OFFSET ?
+            """;
     private final RoomDao roomDao;
     private final CustomJdbcTemplate jdbc;
 
@@ -186,6 +220,91 @@ public class RoomRepository {
         } catch (RuntimeException e) {
             log.error("findByTypeId({}, {}) failed", typeId, pg, e);
             return new PageImpl<>(Collections.emptyList(), pg, 0);
+        }
+    }
+
+    /**
+     * Count how many rooms exist with the given locationId AND typeId.
+     */
+    public long countByLocationAndType(Long locationId, Long typeId) {
+        try {
+            Long total = jdbc.queryForObject(
+                    COUNT_BY_LOCATION_AND_TYPE,
+                    LONG_MAPPER,
+                    locationId,
+                    typeId
+            );
+            return (total != null ? total : 0L);
+        } catch (RuntimeException e) {
+            log.error("countByLocationAndType({}, {}) failed", locationId, typeId, e);
+            return 0L;
+        }
+    }
+
+    /**
+     * Find a Page of Room entities where (location_id = ?) AND (type_id = ?) AND (name ILIKE %nameFilter%).
+     * If nameFilter is blank, it ignores the name condition.
+     */
+    public Page<Room> findByLocationAndTypeAndName(
+            Long locationId,
+            Integer typeId,
+            String nameFilter,
+            Pageable pg
+    ) {
+        try {
+            String pattern = "%" + (nameFilter == null ? "" : nameFilter.trim()) + "%";
+            if (nameFilter == null || nameFilter.isBlank()) {
+                Long total = jdbc.queryForObject(
+                        COUNT_BY_LOCATION_AND_TYPE,
+                        LONG_MAPPER,
+                        locationId,
+                        typeId.longValue()
+                );
+                List<Room> list = jdbc.query(
+                        SELECT_PAGE_BY_LOCATION_AND_TYPE,
+                        ROW_MAPPER,
+                        locationId,
+                        typeId.longValue(),
+                        pg.getPageSize(),
+                        pg.getOffset()
+                );
+                return new PageImpl<>(list, pg, (total != null ? total : 0L));
+            } else {
+                Long total = jdbc.queryForObject(
+                        COUNT_BY_LOCATION_AND_TYPE_AND_NAME,
+                        LONG_MAPPER,
+                        locationId,
+                        typeId.longValue(),
+                        pattern
+                );
+                List<Room> list = jdbc.query(
+                        SELECT_PAGE_BY_LOCATION_AND_TYPE_AND_NAME,
+                        ROW_MAPPER,
+                        locationId,
+                        typeId.longValue(),
+                        pattern,
+                        pg.getPageSize(),
+                        pg.getOffset()
+                );
+                return new PageImpl<>(list, pg, (total != null ? total : 0L));
+            }
+        } catch (RuntimeException e) {
+            log.error("findByLocationAndTypeAndName({}, {}, {}, {}) failed",
+                    locationId, typeId, nameFilter, pg, e);
+            return new PageImpl<>(Collections.emptyList(), pg, 0L);
+        }
+    }
+
+    public List<Room> findRoomsListByLocationAndType(Long locationId, Integer typeId) {
+        try {
+            return jdbc.query(
+                    SELECT_LIST_BY_LOCATION_AND_TYPE,
+                    ROW_MAPPER,
+                    locationId, typeId
+            );
+        } catch (RuntimeException e) {
+            log.error("findRoomsListByLocationAndType({}, {}) failed", locationId, typeId, e);
+            return Collections.emptyList();
         }
     }
 }

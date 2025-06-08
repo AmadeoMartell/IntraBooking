@@ -62,4 +62,11 @@ public class StatusServiceImpl implements StatusService {
         }
         statusRepository.deleteById(statusId);
     }
+
+    @Override
+    public StatusDto getStatusByName(String name) {
+        Status existing = statusRepository.findByName(name)
+                .orElseThrow(() -> new NotFoundException("Status with name=" + name + " not found"));
+        return statusMapper.toDto(existing);
+    }
 }

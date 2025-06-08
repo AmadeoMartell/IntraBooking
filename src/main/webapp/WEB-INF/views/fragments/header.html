@@ -3,18 +3,37 @@
      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
   <header class="sticky top-0 left-0 right-0 bg-white shadow-md z-50">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-      <a th:href="@{/}" class="text-xl font-bold text-indigo-600"
+
+      <a th:href="@{/}"
+         class="text-xl font-bold text-indigo-600"
          th:text="#{header.brand}">
         IntraBooking
       </a>
-      <div class="space-x-4">
+
+      <div class="flex items-center space-x-4">
+
+        <a th:href="@{/booking/step1}"
+           sec:authorize="isAuthenticated()"
+           class="px-3 py-2 text-gray-700 hover:text-indigo-600 transition"
+           th:text="#{header.booking}">
+          Booking
+        </a>
+        <a th:href="@{/}"
+           sec:authorize="isAuthenticated()"
+           class="px-3 py-2 text-gray-700 hover:text-indigo-600 transition"
+           th:text="#{header.dashboard}">
+          Dashboard
+        </a>
+
         <a th:href="@{/login}"
            sec:authorize="isAnonymous()"
            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
            th:text="#{header.login}">
           Sign In
         </a>
-        <form th:action="@{/logout}" method="post"
+
+        <form th:action="@{/logout}"
+              method="post"
               sec:authorize="isAuthenticated()"
               class="inline">
           <input type="hidden"
@@ -26,6 +45,25 @@
             Sign Out
           </button>
         </form>
+
+        <div class="flex items-center space-x-2">
+          <a th:href="@{/(lang='kz')}"
+             class="px-2 py-1 rounded transition"
+             th:classappend="${#locale.language=='kz'} ? 'font-semibold text-indigo-600' : 'text-gray-700 hover:text-indigo-600'">
+            Қаз
+          </a>
+          <a th:href="@{/(lang='ru')}"
+             class="px-2 py-1 rounded transition"
+             th:classappend="${#locale.language=='ru'} ? 'font-semibold text-indigo-600' : 'text-gray-700 hover:text-indigo-600'">
+            Рус
+          </a>
+          <a th:href="@{/(lang='en')}"
+             class="px-2 py-1 rounded transition"
+             th:classappend="${#locale.language=='en'} ? 'font-semibold text-indigo-600' : 'text-gray-700 hover:text-indigo-600'">
+            Eng
+          </a>
+        </div>
+
       </div>
     </div>
   </header>

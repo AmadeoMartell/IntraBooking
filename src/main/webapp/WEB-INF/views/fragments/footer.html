@@ -1,0 +1,35 @@
+<div th:fragment="footer"
+     xmlns:th="http://www.thymeleaf.org">
+    <footer class="bg-gray-100 text-gray-700 py-6">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+
+            <span class="text-sm"
+                  th:text="#{footer.copyright}">
+        © 2025 IntraBooking. All rights reserved.
+      </span>
+
+            <div class="flex flex-wrap gap-4 items-center mt-4 md:mt-0">
+        <span class="text-sm"
+              th:text="#{footer.developedBy}">
+          Developed by
+        </span>
+                <span class="text-sm font-semibold">
+          Medeu Ametay
+        </span>
+                <a href="https://github.com/AmadeoMartell"
+                   target="_blank" rel="noopener"
+                   class="text-sm hover:underline"
+                   th:text="#{footer.github}">
+                    GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/amadeomartell/"
+                   target="_blank" rel="noopener"
+                   class="text-sm hover:underline"
+                   th:text="#{footer.linkedin}">
+                    LinkedIn
+                </a>
+            </div>
+
+        </div>
+    </footer>
+</div>

@@ -4,6 +4,8 @@ import com.epam.capstone.dto.BookingDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+
 /**
  * Service interface for managing bookings.
  */
@@ -85,4 +87,14 @@ public interface BookingService {
      * @return page of booking DTOs for the given username
      */
     Page<BookingDto> getBookingsByUsernameAndStatus(String username, Short statusId, Pageable pageable);
+
+    /**
+     * Check whether the given room is free during [start, end).
+     *
+     * @param roomId ID of the room to check
+     * @param start  desired start time (inclusive)
+     * @param end    desired end time (exclusive)
+     * @return true if no existing booking overlaps this interval
+     */
+    boolean isRoomAvailable(Long roomId, LocalDateTime start, LocalDateTime end);
 }

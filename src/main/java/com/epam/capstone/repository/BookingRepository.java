@@ -125,6 +125,13 @@ public class BookingRepository {
             ORDER BY start_time DESC
                LIMIT ? OFFSET ?
             """;
+    @Language("SQL")
+    private static final String COUNT_OVERLAPPING =
+            "SELECT COUNT(*) " +
+                    "  FROM bookings " +
+                    " WHERE room_id = ? " +
+                    "   AND start_time < ? " +
+                    "   AND end_time   > ?";
 
     private final BookingDao bookingDao;
     private final CustomJdbcTemplate jdbc;
@@ -200,7 +207,7 @@ public class BookingRepository {
     public Page<Booking> findAllByUserId(Long userId, Pageable pg) {
         Sort.Order order = pg.getSort().getOrderFor("startTime");
         boolean descending = (order != null && order.getDirection().isDescending());
-        String sql = descending ? SELECT_PAGE_BY_USER_DESC : SELECT_PAGE_BY_USER;
+        @Language("SQL") String sql = descending ? SELECT_PAGE_BY_USER_DESC : SELECT_PAGE_BY_USER;
 
         Long total = jdbc.queryForObject(COUNT_BY_USER, LONG_MAPPER, userId);
         List<Booking> list = jdbc.query(
@@ -248,7 +255,7 @@ public class BookingRepository {
             Sort.Order order = pg.getSort().getOrderFor("startTime");
             boolean descending = (order != null && order.getDirection().isDescending());
 
-            String selectSql = descending
+            @Language("SQL") String selectSql = descending
                     ? SELECT_PAGE_BY_USER_AND_STATUS_DESC
                     : SELECT_PAGE_BY_USER_AND_STATUS_ASC;
 
@@ -295,5 +302,26 @@ public class BookingRepository {
                 kw,
                 pg
         );
+    }
+
+    public long countOverlappingBookings(
+            Long roomId,
+            LocalDateTime desiredStart,
+            LocalDateTime desiredEnd
+    ) {
+        try {
+            Timestamp endTs   = Timestamp.valueOf(desiredEnd);
+            Timestamp startTs = Timestamp.valueOf(desiredStart);
+            Long cnt = jdbc.queryForObject(
+                    COUNT_OVERLAPPING,
+                    LONG_MAPPER,
+                    roomId, endTs, startTs
+            );
+            return (cnt != null ? cnt : 0L);
+        } catch (RuntimeException ex) {
+            log.error("countOverlappingBookings({}, {}, {}) failed",
+                    roomId, desiredStart, desiredEnd, ex);
+            throw ex;
+        }
     }
 }

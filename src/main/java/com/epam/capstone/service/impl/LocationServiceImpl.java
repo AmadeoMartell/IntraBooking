@@ -12,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Implementation of {@link LocationService} that manages Locations via LocationRepository and maps entities to DTOs.
  */
@@ -42,6 +45,13 @@ public class LocationServiceImpl implements LocationService {
     public Page<LocationDto> getAllLocations(Pageable pageable) {
         Page<Location> page = locationRepository.findAll(pageable);
         return page.map(locationMapper::toDto);
+    }
+
+    @Override
+    public List<LocationDto> getAllLocations() {
+        List<Location> locations = locationRepository.findAll();
+
+        return locations.stream().map(locationMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
