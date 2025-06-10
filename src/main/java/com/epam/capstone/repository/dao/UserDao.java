@@ -61,7 +61,7 @@ public class UserDao implements CrudDao<User, Long> {
 
     @Override
     public void update(User user) {
-        jdbcTemplate.update(UPDATE_SQL, user.getRoleId(), user.getUsername(), user.getPasswordHash(), user.getFullName(), user.getEmail(), user.getPhone(), user.getUserId(), LocalDateTime.now());
+        jdbcTemplate.update(UPDATE_SQL, user.getRoleId(), user.getUsername(), user.getPasswordHash(), user.getFullName(), user.getEmail(), user.getPhone(), LocalDateTime.now(), user.getUserId());
     }
 
     @Override

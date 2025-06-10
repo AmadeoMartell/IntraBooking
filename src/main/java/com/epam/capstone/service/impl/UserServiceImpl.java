@@ -57,6 +57,12 @@ public class UserServiceImpl implements UserService {
         User existing = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
         userMapper.partialUpdate(userDto, existing);
+        userRepository.selectByUsernameOrEmail(existing.getUsername(), existing.getEmail())
+                .ifPresent(user -> {
+                    if (!user.getUserId().equals(userId)) {
+                        throw new AlreadyExistException("User with username or email=" + user.getUsername() + " or " + user.getEmail() + " already exist!");
+                    }
+                });
         User updated = userRepository.save(existing);
         return userMapper.toDto(updated);
     }

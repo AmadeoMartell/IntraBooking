@@ -2,7 +2,9 @@ package com.epam.capstone.mvc;
 
 import com.epam.capstone.dto.UserDto;
 import com.epam.capstone.exception.AlreadyExistException;
+import com.epam.capstone.exception.NotFoundException;
 import com.epam.capstone.model.form.CreateUserForm;
+import com.epam.capstone.model.form.EditUserForm;
 import com.epam.capstone.service.RoleService;
 import com.epam.capstone.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -99,6 +102,62 @@ public class AdminUserController {
         return "redirect:/admin/users";
     }
 
+    @GetMapping("/{id}/edit")
+    public String showEditForm(@PathVariable("id") Long id, Model model, RedirectAttributes ra) {
+        UserDto user = userService.getUserById(id);
+        EditUserForm editForm = new EditUserForm();
+        editForm.setUserId(user.userId());
+        editForm.setRoleID(user.roleId());
+        editForm.setUsername(user.username());
+        editForm.setFullName(user.fullName());
+        editForm.setEmail(user.email());
+        editForm.setPhone(user.phone());
+
+        model.addAttribute("editForm", editForm);
+        model.addAttribute("roles", roleService.findAll());
+        return "admin/user_edit_form";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String handleEditForm(
+            @PathVariable("id") Long id,
+            @Valid @ModelAttribute("editForm") EditUserForm form,
+            BindingResult br,
+            Model model,
+            RedirectAttributes ra
+    ) {
+        if (!form.isPasswordValid()) {
+            br.rejectValue("password", "{createUserForm.password.size}", "Password must be between 6 and 100 characters");
+        }
+        if (br.hasErrors()) {
+            model.addAttribute("roles", roleService.findAll());
+            return "admin/user_edit_form";
+        }
+
+        UserDto existingUser = userService.getUserById(id);
+        String password = existingUser.passwordHash();
+
+        if (form.getPassword() != null && !form.getPassword().trim().isEmpty()) {
+            password = passwordEncoder.encode(form.getPassword());
+        }
+
+        UserDto dto = new UserDto(
+                form.getUserId(),
+                form.getRoleID(),
+                form.getUsername(),
+                password,
+                form.getFullName(),
+                form.getEmail(),
+                form.getPhone(),
+                existingUser.createdAt(),
+                LocalDateTime.now()
+        );
+
+        userService.updateUser(id, dto);
+        ra.addFlashAttribute("success", "User updated successfully");
+        return "redirect:/admin/users";
+    }
+
     @ExceptionHandler(AlreadyExistException.class)
     public String handleAlreadyExist(
             AlreadyExistException ex,
@@ -107,6 +166,29 @@ public class AdminUserController {
     ) {
         CreateUserForm form = new CreateUserForm();
         try {
+            form.setRoleID(Long.valueOf(request.getParameter("roleID")));
+        } catch (NumberFormatException ignored) { }
+        form.setUsername(request.getParameter("username"));
+        form.setPassword(request.getParameter("password"));
+        form.setFullName(request.getParameter("fullName"));
+        form.setEmail(request.getParameter("email"));
+        form.setPhone(request.getParameter("phone"));
+
+        model.addAttribute("createForm", form);
+        model.addAttribute("roles", roleService.findAll());
+        model.addAttribute("error", ex.getMessage());
+        return "admin/user_form";
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public String handleAlreadyExist(
+            NotFoundException ex,
+            HttpServletRequest request,
+            Model model
+    ) {
+        EditUserForm form = new EditUserForm();
+        try {
+            form.setUserId(Long.valueOf(request.getParameter("userId")));
             form.setRoleID(Long.valueOf(request.getParameter("roleID")));
         } catch (NumberFormatException ignored) { }
         form.setUsername(request.getParameter("username"));
