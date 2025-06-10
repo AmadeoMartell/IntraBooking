@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en" th:lang="${#locale.language}">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title th:text="#{admin.userList.title}">User Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<header th:insert="~{fragments/header :: header}"></header>
+
+<main class="container mx-auto px-4 py-8 flex-grow">
+
+    <div class="flex justify-between items-center mb-4">
+        <form th:action="@{/admin/users}" method="get" class="flex space-x-2">
+            <input type="text" name="name"
+                   th:value="${nameFilter}"
+                   th:placeholder="#{admin.userList.searchPlaceholder}"
+                   class="px-3 py-2 border rounded"/>
+            <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+                    th:text="#{admin.userList.search}">Search</button>
+        </form>
+        <a th:href="@{/admin/users/create}"
+           class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+           th:text="#{admin.userList.create}">Create User</a>
+    </div>
+
+    <form id="deleteForm"
+          th:action="@{/admin/users/delete}"
+          method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+            <table class="min-w-full table-fixed">
+                <thead class="bg-indigo-600 text-white">
+                <tr>
+                    <th class="w-12 px-4 py-2">
+                        <input type="checkbox" id="selectAll" onclick="toggleAll(this)"/>
+                    </th>
+                    <th class="px-4 py-2" th:text="#{admin.userList.id}">ID</th>
+                    <th class="px-4 py-2" th:text="#{admin.userList.username}">Username</th>
+                    <th class="px-4 py-2" th:text="#{admin.userList.fullName}">Full Name</th>
+                    <th class="px-4 py-2" th:text="#{admin.userList.email}">Email</th>
+                    <th class="px-4 py-2" th:text="#{admin.userList.phone}">Phone</th>
+                    <th class="px-4 py-2"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${usersPage.content}" class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-2 text-center">
+                        <input type="checkbox" name="selectedIds" th:value="${user.userId}" class="selectBox"/>
+                    </td>
+                    <td class="px-4 py-2" th:text="${user.userId}">1</td>
+                    <td class="px-4 py-2" th:text="${user.username}">jdoe</td>
+                    <td class="px-4 py-2" th:text="${user.fullName}">John Doe</td>
+                    <td class="px-4 py-2" th:text="${user.email}">jdoe@example.com</td>
+                    <td class="px-4 py-2" th:text="${user.phone}">+1234567890</td>
+                    <td class="px-4 py-2 text-right">
+                        <a th:href="@{|/admin/users/${user.userId}/edit|}"
+                           class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+                           th:text="#{admin.userList.edit}">Edit</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex items-center justify-between mt-4">
+            <button type="button"
+                    id="deleteSelectedBtn"
+                    disabled
+                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                    th:text="#{admin.userList.deleteSelected}">Delete Selected</button>
+
+            <nav th:if="${usersPage.totalPages > 1}">
+                <ul class="inline-flex -space-x-px">
+                    <li th:if="${usersPage.number > 0}">
+                        <a th:href="@{/admin/users(page=0,size=${usersPage.size},name=${nameFilter})}"
+                           class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&lt;&lt;</a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, usersPage.totalPages - 1)}">
+                        <a th:href="@{/admin/users(page=${i},size=${usersPage.size},name=${nameFilter})}"
+                           th:class="${i == usersPage.number} ?
+                           'px-3 py-1 border bg-indigo-500 text-white' :
+                           'px-3 py-1 border bg-white text-indigo-500'"
+                           th:text="${i + 1}">1</a>
+                    </li>
+                    <li th:if="${usersPage.number < usersPage.totalPages - 1}">
+                        <a th:href="@{/admin/users(page=${usersPage.totalPages - 1},size=${usersPage.size},name=${nameFilter})}"
+                           class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;&gt;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </form>
+</main>
+
+<div id="deleteConfirmModal"
+     class="fixed inset-0 bg-gray-800 bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 shadow-lg w-96">
+        <h3 class="text-lg font-medium mb-4" th:text="#{admin.userList.confirmTitle}">
+            Confirm Deletion
+        </h3>
+        <p class="mb-6" th:text="#{admin.userList.confirmMessage}">
+            Are you sure you want to delete the selected user(s)?
+        </p>
+        <div class="flex justify-end space-x-2">
+            <button id="cancelBtn"
+                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
+                    th:text="#{admin.userList.cancel}">Cancel</button>
+            <button id="confirmBtn"
+                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                    th:text="#{admin.userList.delete}">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleAll(src) {
+        document.querySelectorAll('.selectBox').forEach(cb => cb.checked = src.checked);
+        document.getElementById('deleteSelectedBtn').disabled = !src.checked;
+    }
+    document.querySelectorAll('.selectBox').forEach(cb =>
+        cb.addEventListener('change', () => {
+            const any = Array.from(document.querySelectorAll('.selectBox'))
+                .some(c => c.checked);
+            document.getElementById('deleteSelectedBtn').disabled = !any;
+        })
+    );
+
+    const modal   = document.getElementById('deleteConfirmModal'),
+        delBtn  = document.getElementById('deleteSelectedBtn'),
+        cancel  = document.getElementById('cancelBtn'),
+        confirm = document.getElementById('confirmBtn'),
+        form    = document.getElementById('deleteForm');
+
+    delBtn.addEventListener('click', e => {
+        e.preventDefault(); modal.classList.remove('hidden');
+    });
+    cancel.addEventListener('click', () => modal.classList.add('hidden'));
+    confirm.addEventListener('click', () => form.submit());
+</script>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

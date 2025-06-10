@@ -67,12 +67,32 @@ public class UserRepository {
             ORDER BY user_id
                LIMIT ? OFFSET ?
             """;
+    @Language("SQL")
+    private static final String SELECT_BY_USERNAME_OR_EMAIL = """
+    SELECT user_id, role_id, username, password_hash,
+           full_name, email, phone,
+           created_at, updated_at
+      FROM users
+     WHERE username = ?
+        OR email    = ?
+    """;
     private final UserDao userDao;
     private final CustomJdbcTemplate jdbc;
 
     public UserRepository(UserDao userDao, CustomJdbcTemplate jdbc) {
         this.userDao = userDao;
         this.jdbc = jdbc;
+    }
+
+    public Optional<User> selectByUsernameOrEmail(String username, String email) {
+        try {
+            var user = jdbc.queryForObject(
+                    SELECT_BY_USERNAME_OR_EMAIL, ROW_MAPPER, username, email);
+            return Optional.ofNullable(user);
+        } catch (RuntimeException e) {
+            log.error("selectByUsernameOrEmail({} {}) failed", username, email, e);
+            return Optional.empty();
+        }
     }
 
     public Optional<User> findById(Long id) {

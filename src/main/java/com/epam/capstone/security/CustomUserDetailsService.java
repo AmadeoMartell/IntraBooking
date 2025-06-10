@@ -36,8 +36,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userDao.findByUsername(username);
         log.debug("User: {}", user);
         Role role = roleDao.findById(user.getRoleId());
-
+        log.debug("Role: {}", role);
         String roleName = "ROLE_" + role.getName().toUpperCase();
+        log.debug("RoleName: {}", roleName);
         List<GrantedAuthority> authorities =
                 Collections.singletonList(new SimpleGrantedAuthority(roleName));
 

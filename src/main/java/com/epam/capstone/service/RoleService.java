@@ -4,6 +4,8 @@ import com.epam.capstone.dto.RoleDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service interface for managing roles.
  */
@@ -32,6 +34,13 @@ public interface RoleService {
      * @return page of role DTOs
      */
     Page<RoleDto> getAllRoles(Pageable pageable);
+
+    /**
+     * Retrieve all roles.
+     *
+     * @return list of role DTOs
+     */
+    List<RoleDto> findAll();
 
     /**
      * Update an existing role.

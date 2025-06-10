@@ -3,7 +3,7 @@ package com.epam.capstone.mvc;
 import com.epam.capstone.dto.LocationDto;
 import com.epam.capstone.dto.RoomDto;
 import com.epam.capstone.dto.RoomTypeDto;
-import com.epam.capstone.model.BookingForm;
+import com.epam.capstone.model.form.BookingForm;
 import com.epam.capstone.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-package com.epam.capstone.model;
+package com.epam.capstone.model.form;
 
 import com.epam.capstone.dto.BookingDto;
 import jakarta.validation.constraints.NotBlank;

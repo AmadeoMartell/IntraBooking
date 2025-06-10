@@ -2,6 +2,7 @@ package com.epam.capstone.service.impl;
 
 import com.epam.capstone.dto.UserDto;
 import com.epam.capstone.dto.mapper.UserMapper;
+import com.epam.capstone.exception.AlreadyExistException;
 import com.epam.capstone.exception.NotFoundException;
 import com.epam.capstone.model.User;
 import com.epam.capstone.repository.UserRepository;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Implementation of {@link UserService} that manages users via UserRepository and maps entities to DTOs.
@@ -27,6 +30,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(UserDto userDto) {
         User entity = userMapper.toEntity(userDto);
+        userRepository.selectByUsernameOrEmail(entity.getUsername(), entity.getEmail())
+                .ifPresent(user -> {
+                    throw new AlreadyExistException("User with username or email=" + user.getUsername() + " or " + user.getEmail() + " already exist!");
+                });
         User saved = userRepository.save(entity);
         return userMapper.toDto(saved);
     }
@@ -61,5 +68,22 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User with id=" + userId + " not found");
         }
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUsers(List<Long> userIds) {
+        for (Long userId : userIds) {
+            if (!userRepository.existsById(userId)) {
+                throw new NotFoundException("User with id=" + userId + " not found");
+            }
+            userRepository.deleteById(userId);
+        }
+    }
+
+    @Override
+    public Page<UserDto> findUsersByName(String nameFilter, Pageable pageable) {
+        var users = userRepository.findByFullNameContaining(nameFilter, pageable);
+        return users.map(userMapper::toDto);
     }
 }

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record UserDto(
         Long userId,
-        Long roleID,
+        Long roleId,
         String username,
         String passwordHash,
         String fullName,

@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Implementation of {@link RoleService} that manages roles via RoleRepository and maps entities to DTOs.
  */
@@ -42,6 +44,14 @@ public class RoleServiceImpl implements RoleService {
     public Page<RoleDto> getAllRoles(Pageable pageable) {
         Page<Role> page = roleRepository.findAll(pageable);
         return page.map(roleMapper::toDto);
+    }
+
+    @Override
+    public List<RoleDto> findAll() {
+        var roles = roleRepository.findAll();
+        return roles.stream()
+                .map(roleMapper::toDto)
+                .toList();
     }
 
     @Override

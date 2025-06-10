@@ -4,6 +4,8 @@ import com.epam.capstone.dto.UserDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service interface for managing users.
  */
@@ -48,4 +50,19 @@ public interface UserService {
      * @param userId ID of the user to delete
      */
     void deleteUser(Long userId);
+
+    /**
+     * Delete a user by its ID.
+     *
+     * @param userIds list of user Id's to delete
+     */
+    void deleteUsers(List<Long> userIds);
+
+    /**
+     * Retrieve all users by name with pagination.
+     * @param nameFilter nameFilter for search
+     * @param pageable pagination information
+     * @return page of user DTOs
+     */
+    Page<UserDto> findUsersByName(String nameFilter, Pageable pageable);
 }

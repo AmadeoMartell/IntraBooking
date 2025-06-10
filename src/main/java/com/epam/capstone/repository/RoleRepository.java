@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -83,6 +84,15 @@ public class RoleRepository {
         } catch (RuntimeException e) {
             log.error("count() failed", e);
             return 0L;
+        }
+    }
+
+    public List<Role> findAll() {
+        try {
+            return roleDao.findAll();
+        } catch (RuntimeException e) {
+            log.error("findAll({}) failed", e);
+            return Collections.emptyList();
         }
     }
 
