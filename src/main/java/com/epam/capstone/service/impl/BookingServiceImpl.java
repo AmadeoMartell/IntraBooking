@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Implementation of {@link BookingService} that manages roles via BookingRepository and maps entities to DTOs.
@@ -124,6 +125,23 @@ public class BookingServiceImpl implements BookingService {
     public boolean isRoomAvailable(Long roomId, LocalDateTime start, LocalDateTime end) {
         long overlapping = bookingRepository.countOverlappingBookings(roomId, start, end);
         return overlapping == 0;
+    }
+
+    @Override
+    public Page<BookingDto> getBookingsByStatus(Short statusId, Pageable pageable) {
+        return bookingRepository.findAllByStatusId(statusId, pageable).map(bookingMapper::toDto);
+    }
+
+    @Override
+    @Transactional
+    public void updateStatuses(List<Long> bookingIds, String name) {
+        for (Long bookingId : bookingIds) {
+            Booking booking = bookingRepository.findById(bookingId)
+                    .orElseThrow(() -> new NotFoundException("Booking not found, id=" + bookingId));
+            var status = statusService.getStatusByName(name);
+            booking.setStatusId(status.statusId());
+            bookingRepository.save(booking);
+        }
     }
 }
 

@@ -65,8 +65,8 @@ public class BookingDao implements CrudDao<Booking, Long> {
                 booking.getStartTime(),
                 booking.getEndTime(),
                 booking.getPurpose(),
-                booking.getBookingId(),
-                LocalDateTime.now());
+                LocalDateTime.now(),
+                booking.getBookingId());
     }
 
     @Override

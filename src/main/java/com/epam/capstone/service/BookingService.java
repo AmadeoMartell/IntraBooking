@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Service interface for managing bookings.
@@ -97,4 +98,8 @@ public interface BookingService {
      * @return true if no existing booking overlaps this interval
      */
     boolean isRoomAvailable(Long roomId, LocalDateTime start, LocalDateTime end);
+
+    Page<BookingDto> getBookingsByStatus(Short statusId, Pageable pageable);
+
+    void updateStatuses(List<Long> bookingIds, String name);
 }

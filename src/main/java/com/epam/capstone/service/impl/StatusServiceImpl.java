@@ -12,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Implementation of {@link StatusService} that manages statuses via StatusRepository and maps entities to DTOs.
  */
@@ -42,6 +45,11 @@ public class StatusServiceImpl implements StatusService {
     public Page<StatusDto> getAllStatuses(Pageable pageable) {
         Page<Status> page = statusRepository.findAll(pageable);
         return page.map(statusMapper::toDto);
+    }
+
+    @Override
+    public List<StatusDto> findAll() {
+        return statusRepository.findAll().stream().map(statusMapper::toDto).collect(Collectors.toList());
     }
 
     @Override

@@ -150,6 +150,15 @@ public class StatusRepository {
         }
     }
 
+    public List<Status> findAll() {
+        try {
+            return jdbc.query(SELECT_ALL_STATUSES, ROW_MAPPER);
+        } catch (RuntimeException e) {
+            log.error("findAll() failed", e);
+            return Collections.emptyList();
+        }
+    }
+
     public Page<Status> findByNameContaining(String kw, Pageable pg) {
         return QueryContainsMatcher.findByQueryContaining(
                 jdbc,

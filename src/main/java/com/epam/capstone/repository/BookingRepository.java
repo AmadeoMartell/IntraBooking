@@ -73,7 +73,17 @@ public class BookingRepository {
                      created_at, updated_at
                 FROM bookings
                WHERE status_id = ?
-            ORDER BY booking_id
+            ORDER BY start_time
+               LIMIT ? OFFSET ?
+            """;
+    @Language("SQL")
+    private static final String SELECT_PAGE_BY_STATUS_DESC = """
+              SELECT booking_id, user_id, room_id, status_id,
+                     start_time, end_time, purpose,
+                     created_at, updated_at
+                FROM bookings
+               WHERE status_id = ?
+            ORDER BY start_time DESC
                LIMIT ? OFFSET ?
             """;
     @Language("SQL")
@@ -234,12 +244,15 @@ public class BookingRepository {
     }
 
     public Page<Booking> findAllByStatusId(Short statusId, Pageable pg) {
+        Sort.Order order = pg.getSort().getOrderFor("startTime");
+        boolean descending = (order != null && order.getDirection().isDescending());
+        @Language("SQL") String sql = descending ? SELECT_PAGE_BY_STATUS_DESC : SELECT_PAGE_BY_STATUS;
         try {
             Long total = jdbc.queryForObject(
                     COUNT_BY_STATUS, LONG_MAPPER, statusId
             );
             List<Booking> list = jdbc.query(
-                    SELECT_PAGE_BY_STATUS, ROW_MAPPER,
+                    sql, ROW_MAPPER,
                     statusId, pg.getPageSize(), pg.getOffset()
             );
             return new PageImpl<>(list, pg, total != null ? total : 0L);

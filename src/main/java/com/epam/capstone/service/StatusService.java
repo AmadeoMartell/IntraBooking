@@ -4,6 +4,8 @@ import com.epam.capstone.dto.StatusDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service interface for managing statuses.
  */
@@ -32,6 +34,13 @@ public interface StatusService {
      * @return page of status DTOs
      */
     Page<StatusDto> getAllStatuses(Pageable pageable);
+
+    /**
+     * Retrieve all statuses.
+     *
+     * @return List of status DTOs
+     */
+    List<StatusDto> findAll();
 
     /**
      * Update an existing status.
