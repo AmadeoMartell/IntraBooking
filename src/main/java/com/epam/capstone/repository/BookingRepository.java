@@ -31,7 +31,7 @@ public class BookingRepository {
     private static final String COUNT_BY_USER =
             "SELECT COUNT(*) FROM bookings WHERE user_id = ?";
     @Language("SQL")
-    private static final String SELECT_PAGE_BY_USER = """
+    static final String SELECT_PAGE_BY_USER = """
               SELECT booking_id, user_id, room_id, status_id,
                      start_time, end_time, purpose,
                      created_at, updated_at
@@ -41,7 +41,7 @@ public class BookingRepository {
                LIMIT ? OFFSET ?
             """;
     @Language("SQL")
-    private static final String SELECT_PAGE_BY_USER_DESC = """
+    static final String SELECT_PAGE_BY_USER_DESC = """
       SELECT booking_id, user_id, room_id, status_id,
              start_time, end_time, purpose,
              created_at, updated_at
@@ -136,7 +136,7 @@ public class BookingRepository {
                LIMIT ? OFFSET ?
             """;
     @Language("SQL")
-    private static final String COUNT_OVERLAPPING =
+    static final String COUNT_OVERLAPPING =
             "SELECT COUNT(*) " +
                     "  FROM bookings " +
                     " WHERE room_id = ? " +

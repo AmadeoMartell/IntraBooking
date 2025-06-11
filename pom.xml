@@ -27,6 +27,8 @@
 
     <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
     <junit.version>5.12.2</junit.version>
+    <mockito.version>5.18.0</mockito.version>
+    <assertj.version>3.27.3</assertj.version>
     <lombok.version>1.18.36</lombok.version>
     <mapstruct.version>1.5.5.Final</mapstruct.version>
     <lombok.mapstruct.binding.version>0.2.0</lombok.mapstruct.binding.version>
@@ -118,6 +120,28 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj.version}</version>
       <scope>test</scope>
     </dependency>
 

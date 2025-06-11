@@ -9,6 +9,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Backing form for booking creation and editing, with validation for each step.
+ * Provides conversion to {@link BookingDto}.
+ */
 @Data
 @NoArgsConstructor
 public class BookingForm {
@@ -48,10 +52,11 @@ public class BookingForm {
     private LocalDateTime endDateTime;
 
     /**
-     * Convert this form into a BookingDto.
+     * Convert this form into a BookingDto for persistence or service layer use.
+     * Logs conversion at debug level.
      *
-     * @param statusId the initial status (e.g. PENDING)
-     * @return a BookingDto ready to be passed to BookingService
+     * @param statusId the initial status ID for the new booking
+     * @return a BookingDto populated from this form's fields
      */
     public BookingDto toBookingDto(Short statusId) {
         return new BookingDto(
