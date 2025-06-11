@@ -57,4 +57,12 @@ public interface LocationService {
      * @param locationId ID of the location to delete
      */
     void deleteLocation(Long locationId);
+
+    /**
+     * Retrieve all locations by nameFilter with pagination.
+     * @param nameFilter string filter for search
+     * @param pageable pagination information
+     * @return page of location DTOs
+     */
+    Page<LocationDto> findByName(String nameFilter, Pageable pageable);
 }

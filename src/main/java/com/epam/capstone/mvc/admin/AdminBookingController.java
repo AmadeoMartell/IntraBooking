@@ -1,8 +1,7 @@
-package com.epam.capstone.mvc;
+package com.epam.capstone.mvc.admin;
 
 import com.epam.capstone.dto.*;
 import com.epam.capstone.dto.view.BookingFullView;
-import com.epam.capstone.dto.view.BookingView;
 import com.epam.capstone.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

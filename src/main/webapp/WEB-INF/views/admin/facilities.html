@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en" th:lang="${#locale.language}">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title th:text="#{admin.facilities.title}">Manage Facilities</title>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<header th:insert="~{fragments/header :: header}"></header>
+
+<main class="container mx-auto px-4 py-8 flex-grow space-y-12">
+
+  <section>
+    <h2 class="text-2xl font-semibold mb-4" th:text="#{admin.facilities.locations}">Locations</h2>
+    <form th:action="@{/admin/facilities}" method="get" class="flex gap-2 mb-4">
+      <input type="text" name="locFilter" th:value="${locFilter}"
+             th:placeholder="#{admin.facilities.searchPlaceholder}"
+             class="border px-2 py-1 rounded"/>
+      <button type="submit"
+              class="bg-indigo-600 text-white px-3 py-1 rounded"
+              th:text="#{admin.facilities.search}">Search</button>
+    </form>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div th:each="loc : ${locationPage.content}"
+           class="p-4 bg-white rounded shadow flex justify-between items-center">
+        <span th:text="${loc.name}">Location Name</span>
+        <a th:href="@{/admin/facilities(locFilter=${locFilter},locPage=${locationPage.number},selectedLocationId=${loc.locationId})}"
+           class="px-2 py-1 bg-green-500 text-white rounded"
+           th:text="#{admin.facilities.select}">Select</a>
+      </div>
+      <div class="p-4 bg-gray-200 rounded flex justify-center items-center">
+        <a th:href="@{/admin/locations/create}"
+           class="text-indigo-600 hover:underline"
+           th:text="#{admin.facilities.createLocation}">+ Create New</a>
+      </div>
+    </div>
+    <nav class="mt-4 flex justify-center" th:if="${locationPage.totalPages > 1}">
+      <ul class="inline-flex -space-x-px">
+        <li th:if="${locationPage.number > 0}">
+          <a th:href="@{/admin/facilities(locPage=0,locFilter=${locFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&lt;&lt;</a>
+        </li>
+        <li th:if="${locationPage.number > 0}">
+          <a th:href="@{/admin/facilities(locPage=${locationPage.number - 1},locFilter=${locFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&lt;</a>
+        </li>
+        <li th:each="i : ${locPages}">
+          <a th:href="@{/admin/facilities(locPage=${i},locFilter=${locFilter})}"
+             th:class="${i == locationPage.number}
+                           ? 'px-3 py-1 border bg-indigo-500 text-white'
+                           : 'px-3 py-1 border bg-white text-indigo-500'"
+             th:text="${i + 1}">1</a>
+        </li>
+        <li th:if="${locationPage.number < locationPage.totalPages - 1}">
+          <a th:href="@{/admin/facilities(locPage=${locationPage.number + 1},locFilter=${locFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;</a>
+        </li>
+        <li th:if="${locationPage.number < locationPage.totalPages - 1}">
+          <a th:href="@{/admin/facilities(locPage=${locationPage.totalPages - 1},locFilter=${locFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;&gt;</a>
+        </li>
+      </ul>
+    </nav>
+  </section>
+
+  <section th:if="${selectedLocationId != null}">
+    <h2 class="text-2xl font-semibold mb-4" th:text="#{admin.facilities.roomTypes}">Room Types</h2>
+    <form th:action="@{/admin/facilities}" method="get" class="flex gap-2 mb-4">
+      <input type="hidden" name="selectedLocationId" th:value="${selectedLocationId}"/>
+      <input type="text" name="typeFilter" th:value="${typeFilter}"
+             th:placeholder="#{admin.facilities.searchPlaceholder}"
+             class="border px-2 py-1 rounded"/>
+      <button type="submit"
+              class="bg-indigo-600 text-white px-3 py-1 rounded"
+              th:text="#{admin.facilities.search}">Search</button>
+    </form>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div th:each="rt : ${typePage.content}"
+           class="p-4 bg-white rounded shadow flex justify-between items-center">
+        <span th:text="${rt.name}">Type Name</span>
+        <a th:href="@{/admin/facilities(
+                        selectedLocationId=${selectedLocationId},
+                        locFilter=${locFilter},
+                        typeFilter=${typeFilter},
+                        typePage=${typePage.number},
+                        selectedTypeId=${rt.typeId})}"
+           class="px-2 py-1 bg-green-500 text-white rounded"
+           th:text="#{admin.facilities.select}">Select</a>
+      </div>
+      <div class="p-4 bg-gray-200 rounded flex justify-center items-center">
+        <a th:href="@{/admin/roomtypes/create}"
+           class="text-indigo-600 hover:underline"
+           th:text="#{admin.facilities.createRoomType}">+ Create New</a>
+      </div>
+    </div>
+    <nav class="mt-4 flex justify-center" th:if="${typePage.totalPages > 1}">
+      <ul class="inline-flex -space-x-px">
+        <li th:if="${typePage.number > 0}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          typePage=0,
+                          typeFilter=${typeFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&lt;&lt;</a>
+        </li>
+        <li th:if="${typePage.number > 0}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          typePage=${typePage.number - 1},
+                          typeFilter=${typeFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&lt;</a>
+        </li>
+        <li th:each="i : ${typePages}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          typePage=${i},
+                          typeFilter=${typeFilter})}"
+             th:class="${i == typePage.number}
+                           ? 'px-3 py-1 border bg-indigo-500 text-white'
+                           : 'px-3 py-1 border bg-white text-indigo-500'"
+             th:text="${i + 1}">1</a>
+        </li>
+        <li th:if="${typePage.number < typePage.totalPages - 1}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          typePage=${typePage.number + 1},
+                          typeFilter=${typeFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;</a>
+        </li>
+        <li th:if="${typePage.number < typePage.totalPages - 1}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          typePage=${typePage.totalPages - 1},
+                          typeFilter=${typeFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;&gt;</a>
+        </li>
+      </ul>
+    </nav>
+  </section>
+
+  <section th:if="${selectedLocationId != null && selectedTypeId != null}">
+    <h2 class="text-2xl font-semibold mb-4" th:text="#{admin.facilities.rooms}">Rooms</h2>
+    <form th:action="@{/admin/facilities}" method="get" class="flex gap-2 mb-4">
+      <input type="hidden" name="selectedLocationId" th:value="${selectedLocationId}"/>
+      <input type="hidden" name="selectedTypeId" th:value="${selectedTypeId}"/>
+      <input type="text" name="roomFilter" th:value="${roomFilter}"
+             th:placeholder="#{admin.facilities.searchPlaceholder}"
+             class="border px-2 py-1 rounded"/>
+      <button type="submit"
+              class="bg-indigo-600 text-white px-3 py-1 rounded"
+              th:text="#{admin.facilities.search}">Search</button>
+    </form>
+
+    <div class="mb-4">
+      <a th:href="@{|/admin/rooms/create?locationId=${selectedLocationId}&typeId=${selectedTypeId}|}"
+         class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+         th:text="#{admin.facilities.createRoom}">+ Create Room</a>
+    </div>
+
+    <div class="overflow-x-auto bg-white rounded-lg shadow">
+      <table class="min-w-full table-auto">
+        <thead class="bg-indigo-600 text-white">
+        <tr>
+          <th class="w-12 px-4 py-2"></th>
+          <th class="px-4 py-2" th:text="#{admin.facilities.roomName}">Name</th>
+          <th class="px-4 py-2" th:text="#{admin.facilities.capacity}">Capacity</th>
+          <th class="px-4 py-2" th:text="#{admin.facilities.actions}">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="room : ${roomPage.content}"
+            class="border-b hover:bg-gray-50">
+          <td class="px-4 py-2 text-center">
+            <input type="checkbox" name="roomIds" th:value="${room.roomId}" class="selectBox"/>
+          </td>
+          <td class="px-4 py-2" th:text="${room.name}">Room 101</td>
+          <td class="px-4 py-2" th:text="${room.capacity}">4</td>
+          <td class="px-4 py-2 space-x-2">
+            <a th:href="@{/admin/rooms/edit/{id}(id=${room.roomId})}"
+               class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+               th:text="#{admin.facilities.edit}">Edit</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="mt-4 flex justify-center" th:if="${roomPage.totalPages > 1}">
+      <ul class="inline-flex -space-x-px">
+        <li th:if="${roomPage.number > 0}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          selectedTypeId=${selectedTypeId},
+                          roomPage=0,
+                          roomFilter=${roomFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&lt;&lt;</a>
+        </li>
+        <li th:if="${roomPage.number > 0}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          selectedTypeId=${selectedTypeId},
+                          roomPage=${roomPage.number - 1},
+                          roomFilter=${roomFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&lt;</a>
+        </li>
+        <li th:each="i : ${roomPages}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          selectedTypeId=${selectedTypeId},
+                          roomPage=${i},
+                          roomFilter=${roomFilter})}"
+             th:class="${i == roomPage.number}
+                           ? 'px-3 py-1 border bg-indigo-500 text-white'
+                           : 'px-3 py-1 border bg-white text-indigo-500'"
+             th:text="${i + 1}">1</a>
+        </li>
+        <li th:if="${roomPage.number < roomPage.totalPages - 1}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          selectedTypeId=${selectedTypeId},
+                          roomPage=${roomPage.number + 1},
+                          roomFilter=${roomFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;</a>
+        </li>
+        <li th:if="${roomPage.number < roomPage.totalPages - 1}">
+          <a th:href="@{/admin/facilities(
+                          selectedLocationId=${selectedLocationId},
+                          selectedTypeId=${selectedTypeId},
+                          roomPage=${roomPage.totalPages - 1},
+                          roomFilter=${roomFilter})}"
+             class="px-3 py-1 border bg-white text-indigo-500 hover:bg-indigo-100">&gt;&gt;</a>
+        </li>
+      </ul>
+    </nav>
+  </section>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

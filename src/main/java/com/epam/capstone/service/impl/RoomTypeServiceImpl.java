@@ -79,4 +79,10 @@ public class RoomTypeServiceImpl implements RoomTypeService {
         }
         roomTypeRepository.deleteById(typeId);
     }
+
+    @Override
+    public Page<RoomTypeDto> findByName(String nameFilter, Pageable pageable) {
+        Page<RoomType> roomTypes = roomTypeRepository.findByNameContaining(nameFilter, pageable);
+        return roomTypes.map(roomTypeMapper::toDto);
+    }
 }

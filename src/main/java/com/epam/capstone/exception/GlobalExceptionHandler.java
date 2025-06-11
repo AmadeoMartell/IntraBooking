@@ -81,6 +81,7 @@ public class GlobalExceptionHandler {
             org.springframework.ui.Model model
     ) {
         response.setStatus(400);
+        log.warn("Bad request on [{} {}]:", request.getMethod(), request.getRequestURI(), ex);
         model.addAttribute("statusCode", 400);
         model.addAttribute("errorText", ex.getMessage() != null
                 ? ex.getMessage()

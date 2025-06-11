@@ -42,6 +42,12 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
+    public Page<LocationDto> findByName(String nameFilter, Pageable pageable) {
+        Page<Location> page = locationRepository.findByNameContaining(nameFilter, pageable);
+        return page.map(locationMapper::toDto);
+    }
+
+    @Override
     public Page<LocationDto> getAllLocations(Pageable pageable) {
         Page<Location> page = locationRepository.findAll(pageable);
         return page.map(locationMapper::toDto);

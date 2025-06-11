@@ -63,4 +63,13 @@ public interface RoomTypeService {
      * @param typeId ID of the room type to delete
      */
     void deleteRoomType(Integer typeId);
+
+    /**
+     * Retrieve all room types with pagination.
+     * 
+     * @param nameFilter string filter for search
+     * @param pageable pagination information
+     * @return page of room type DTOs
+     */
+    Page<RoomTypeDto> findByName(String nameFilter, Pageable pageable);
 }

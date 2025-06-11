@@ -1,4 +1,4 @@
-package com.epam.capstone.mvc;
+package com.epam.capstone.mvc.admin;
 
 import com.epam.capstone.dto.UserDto;
 import com.epam.capstone.exception.AlreadyExistException;
