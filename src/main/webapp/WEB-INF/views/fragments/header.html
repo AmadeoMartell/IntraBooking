@@ -37,6 +37,12 @@
            th:text="#{header.adminFacilities}">
           Admin Facilities
         </a>
+        <a th:href="@{/admin/bookings}"
+           sec:authorize="hasRole('ADMIN')"
+           class="px-3 py-2 text-gray-700 hover:text-indigo-600 transition"
+           th:text="#{header.adminBookings}">
+          Admin Bookings
+        </a>
 
         <a th:href="@{/login}"
            sec:authorize="isAnonymous()"
