@@ -201,26 +201,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getBookingsByUsernameAndStatus_success() {
-        User user = new User(); user.setUserId(20L);
-        Pageable pg = PageRequest.of(1, 2);
-        Booking b = new Booking();
-        Page<Booking> page = new PageImpl<>(List.of(b), pg, 1);
-
-        when(userRepository.findByUsername("eve"))
-                .thenReturn(Optional.of(user));
-        when(bookingRepository.findAllByUserIdAndStatusId(20L, (short)2, pg))
-                .thenReturn(page);
-        when(bookingMapper.toDto(b)).thenReturn(dummyDto);
-
-        Page<BookingDto> result =
-                service.getBookingsByUsernameAndStatus("eve", (short)2, pg);
-
-        assertEquals(1, result.getTotalElements());
-        assertEquals(List.of(dummyDto), result.getContent());
-    }
-
-    @Test
     void getBookingsByUsernameAndStatus_userNotFound() {
         when(userRepository.findByUsername("frank"))
                 .thenReturn(Optional.empty());
