@@ -76,7 +76,8 @@ The `ansible` directory contains a playbook that provisions Docker on the target
 You can also run the application with a local PostgreSQL instance and an embedded servlet container.
 
 1. Start PostgreSQL and create a database matching the values in `.env` (e.g. `exampleDB`).
-2. Set the following environment variables before running Maven (or define them in your IDE):
+2. Set up database tables by `schema.sql` and define main statuses with `data.sql`.
+2. Add the following environment variables before running Maven (or define them in your IDE):
    ```bash
    export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/exampleDB
    export SPRING_DATASOURCE_USERNAME=exampleName
